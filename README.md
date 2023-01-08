@@ -22,3 +22,4 @@ Algunas de las instalaciones recomendadas para el curso son las siguientes: [(Do
 ## Documentación
 
 - [Sección 01: Introducción](01-Introduccion/README.md)
+- [Sección 02: Bases de Docker](02-Bases_Docker/README.md)
