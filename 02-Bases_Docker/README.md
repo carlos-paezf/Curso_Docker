@@ -262,3 +262,51 @@ $: docker container stop some-docker
 ```txt
 $: docker container rm some-docker
 ```
+
+## Multiples instancias de Postgres
+
+Vamos a crear múltiples contenedores de postgres con diversas versiones de la imagen, para lo cual usamos los siguientes comandos (para los saltos de línea en consola usamos `\` en Linux y ` en Windows):
+
+```txt
+$: docker container run \
+      --name postgres-alpha \
+      -e POSTGRES_PASSWORD=my_pass1 \
+      -dp 5433:5432 \
+      postgres:latest
+
+$: docker container run \
+      --name postgres-beta \
+      -e POSTGRES_PASSWORD=my_pass2 \
+      -dp 5434:5432 \
+      postgres:15-alpine
+```
+
+Podemos listar los 2 contenedores creados activos con el comando `docker container ps`:
+
+```txt
+CONTAINER ID   IMAGE                COMMAND                  CREATED              STATUS              PORTS                    NAMES
+cc6570edb62e   postgres:15-alpine   "docker-entrypoint.s…"   56 seconds ago       Up 55 seconds       0.0.0.0:5434->5432/tcp   postgres-beta
+818b6444e25f   postgres:latest      "docker-entrypoint.s…"   About a minute ago   Up About a minute   0.0.0.0:5433->5432/tcp   postgres-alpha 
+```
+
+Ahora vamos a TablePlus y creamos 2 nuevas conexiones con los siguientes datos:
+
+|Key|Conexión 1|Conexión 2|
+|--|--|--|
+|Connection|PostgreSQL|PostgreSQL|
+|Name|`postgres-alpha`|`postgres-beta`|
+|Host|`localhost`|`localhost`|
+|Port|`5433`|`5434`|
+|User|`postgres`|`postgres`|
+|Password|`my_pass1`|`my_pass2`|
+|Database|--|--|
+
+Como se ha podido comprobar, las 2 instancias de Postgres con diferentes versiones funcionan correctamente y a a la misma vez en el mismo equipo, también funciona si son contenedores con la misma versión de la imagen. Es muy importante que los nombres y puertos sean diferentes en cada contenedor.
+
+En caso de que montemos un contenedor en el mismo puerto de otro, se creará una instancia que no se ejecuta y que debemos eliminar antes de volver a intentar subir el contenedor en un nuevo puerto.
+
+Para detener y eliminar los contenedores que están en ejecución usamos el siguiente comando (usamos la bandera `-f` por qué estamos seguros de eliminarlos y queremos acortar proceso):
+
+```txt
+$: docker container rm -f postgres-alpha postgres-beta
+```
