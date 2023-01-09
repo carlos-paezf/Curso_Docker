@@ -140,3 +140,79 @@ Y para hacer la eliminación de cualquiera de ellas, tenemos las mismas opciones
 ## Docker Desktop - Mismos comandos usados
 
 En Docker Desktop se simplifica los procesos, puesto que podemos hacer la búsqueda de imágenes o contenedores a través de inputs, podemos observar de una manera más estética todos los contenedores, volúmenes o imágenes; los logs de los contenedores se encuentran a un click de distancia. Básicamente todas las acciones son fáciles de realizar desde la GUI de Docker Desktop, aún así se recomienda que se usen más los comandos que la interfaz de la aplicación.
+
+## Publish and Detached modes
+
+Para iniciar vamos a abrir en un navegador la dirección de `localhost`, este se abrirá directamente en el puesto `80` en caso de que algo corriendo en ese puerto, podemos detenerlo, o cambiamos de puerto la instalación que vamos a hacer a continuación.
+
+Vamos a levantar la imagen oficial de Docker llamada `getting-started`:
+
+```txt
+$: docker container run -d -p 80:80 docker/getting-started
+```
+
+Si queremos cambiar el puerto de escucha en el host, cambiamos de `80:80` a `<puerto en el host>:80`. Las banderas usadas en el comando significan lo siguiente:
+
+- `-d` (Detached mode) ejecutar el contenedor en background
+- `-p` (Publish mode) mapea el puerto del host al puerto del contenedor.
+
+Podemos simplificar el uso de los dos comandos haciendo uso de la bandera `-dp`.
+
+Si regresamos al `localhost` con el puerto 80, o el definido por nosotros, vamos a observar que tenemos la guía oficial de Docker.
+
+Si queremos detener el contenedor, hacemos uso del comando `stop`, y para volver a ejecutarlo empleamos `start`.
+
+Por ejemplo, para el caso del contenedor que tenemos ejecutando del tutorial de Docker no conocemos o no recordamos el nombre o id, entonces ejecutamos el comando para listar contenedores:
+
+```txt
+$: docker container ls
+```
+
+Del comando anterior obtenemos el siguiente output:
+
+```txt
+CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS          PORTS                    NAMES
+0511bd729752   docker/getting-started   "/docker-entrypoint.…"   7 minutes ago   Up 7 minutes    0.0.0.0:80->80/tcp       nifty_panini
+```
+
+Para detener el contenedor podemos hacer uso de su nombre, su id o los 3 primeros caracteres del mismo:
+
+1. ```txt
+   $: docker container stop nifty_panini
+   ```
+
+2. ```txt
+   $: docker container stop 0511bd729752
+   ```
+
+3. ```txt
+   $: docker container stop 051
+   ```
+
+Para levantar de nuevo el contenedor, es decir, para ponerlo en ejecución, tenemos las mismas 3 opciones anterior, pero haciendo uso del comando `start`
+
+1. ```txt
+   $: docker container start nifty_panini
+   ```
+
+2. ```txt
+   $: docker container start 0511bd729752
+   ```
+
+3. ```txt
+   $: docker container start 051
+   ```
+
+Para la eliminación del contenedor y de la imagen usamos alguna de las opciones mencionadas en la sección de [Borrar contenedores e imágenes](README.md#borrar-contenedores-e-imágenes), en este caso ejecute los siguientes comandos:
+
+```txt
+$: docker container rm -f 051
+```
+
+```txt
+$: docker image ls
+```
+
+```txt
+$: docker image rm docker/getting-started
+```
