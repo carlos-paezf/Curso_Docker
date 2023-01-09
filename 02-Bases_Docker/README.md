@@ -136,3 +136,7 @@ Y para hacer la eliminación de cualquiera de ellas, tenemos las mismas opciones
 3. ```txt
    $: docker image rm feb
    ```
+
+## Docker Desktop - Mismos comandos usados
+
+En Docker Desktop se simplifica los procesos, puesto que podemos hacer la búsqueda de imágenes o contenedores a través de inputs, podemos observar de una manera más estética todos los contenedores, volúmenes o imágenes; los logs de los contenedores se encuentran a un click de distancia. Básicamente todas las acciones son fáciles de realizar desde la GUI de Docker Desktop, aún así se recomienda que se usen más los comandos que la interfaz de la aplicación.
