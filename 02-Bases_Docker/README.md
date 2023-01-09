@@ -216,3 +216,23 @@ $: docker image ls
 ```txt
 $: docker image rm docker/getting-started
 ```
+
+## Variables de entorno
+
+Las variables de entorno son variables que existen en un entorno, en este caso un contenedor, se definen con el flag `-e`. Vamos a descargar la imagen oficial de [Postgres](https://hub.docker.com/_/postgres) en su versión `latest` con el siguiente comando (podemos definir la versión que queremos descargar escribiendo `postgres:<version>`):
+
+```txt
+$: docker pull postgres
+```
+
+En la documentación de la imagen nos mencionan las variables de entorno que requieren al momento de crear una instancia de la misma. En este ejemplo vamos a crear un contenedor al cual le definimos la variable de entorno de la contraseña:
+
+```txt
+$: docker container run --name some-postgres -e POSTGRES_PASSWORD=my_password -d postgres
+```
+
+Por defecto el puerto que se define para el contenedor es el `5432`, podemos definir otro puerto usando la bandera `-p` o `-dp` si queremos definir que también corra en background:
+
+```txt
+$: docker container run --name some-postgres -e POSTGRES_PASSWORD=my_password -dp 5433:5432 postgres
+```
