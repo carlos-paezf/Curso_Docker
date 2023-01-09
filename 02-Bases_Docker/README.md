@@ -265,7 +265,7 @@ $: docker container rm some-docker
 
 ## Multiples instancias de Postgres
 
-Vamos a crear múltiples contenedores de postgres con diversas versiones de la imagen, para lo cual usamos los siguientes comandos (para los saltos de línea en consola usamos `\` en Linux y ` en Windows):
+Vamos a crear múltiples contenedores de postgres con diversas versiones de la imagen, para lo cual usamos los siguientes comandos (para los saltos de línea en consola usamos `\` en Linux y <code>`</code> en Windows):
 
 ```txt
 $: docker container run \
@@ -309,4 +309,145 @@ Para detener y eliminar los contenedores que están en ejecución usamos el sigu
 
 ```txt
 $: docker container rm -f postgres-alpha postgres-beta
+```
+
+## Logs del contenedor
+
+Vamos a descargar la imagen oficial de MariaDB en su versión de `jammy`:
+
+```txt
+$: docker pull mariadb:jammy
+```
+
+Ahora creamos un contenedor en background que generara una contraseña random para el usuario root y la intensión será rescatar dicho password desde los logs.
+
+Para la primera parte usamos el siguiente comando:
+
+```txt
+$: docker container run \
+      -e MARIADB_RANDOM_ROOT_PASSWORD=yes \
+      -dp 3306:3306 \
+      mariadb:jammy
+```
+
+Para observar los logs necesitamos el id del contenedor, ya que no le pusimos un nombre, dicho id se muestra al momento de crear el contenedor o podemos usar el comando `docker container ls`. Los logs aparecen si usamos el siguiente comando:
+
+```txt
+$: docker container logs <id del contenedor>
+```
+
+La salida que obtendremos será similar a la siguiente:
+
+```txt
+2023-01-09 20:51:38+00:00 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:10.10.2+maria~ubu2204 started.
+2023-01-09 20:51:38+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2023-01-09 20:51:38+00:00 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:10.10.2+maria~ubu2204 started.
+2023-01-09 20:51:38+00:00 [Note] [Entrypoint]: Initializing database files
+
+
+PLEASE REMEMBER TO SET A PASSWORD FOR THE MariaDB root USER !
+To do so, start the server, then issue the following command:
+
+'/usr/bin/mysql_secure_installation'
+
+which will also give you the option of removing the test
+databases and anonymous user created by default.  This is
+strongly recommended for production servers.
+
+See the MariaDB Knowledgebase at https://mariadb.com/kb
+
+Please report any problems at https://mariadb.org/jira
+
+The latest information about MariaDB is available at https://mariadb.org/.
+
+Consider joining MariaDB's strong and vibrant community:
+https://mariadb.org/get-involved/
+
+2023-01-09 20:51:40+00:00 [Note] [Entrypoint]: Database files initialized
+2023-01-09 20:51:40+00:00 [Note] [Entrypoint]: Starting temporary server
+2023-01-09 20:51:40+00:00 [Note] [Entrypoint]: Waiting for server startup
+2023-01-09 20:51:40 0 [Note] mariadbd (server 10.10.2-MariaDB-1:10.10.2+maria~ubu2204) starting as process 99 ...
+2023-01-09 20:51:40 0 [Note] InnoDB: Compressed tables use zlib 1.2.11
+2023-01-09 20:51:40 0 [Note] InnoDB: Number of transaction pools: 1
+2023-01-09 20:51:40 0 [Note] InnoDB: Using crc32 + pclmulqdq instructions
+2023-01-09 20:51:40 0 [Note] mariadbd: O_TMPFILE is not supported on /tmp (disabling future attempts)
+2023-01-09 20:51:40 0 [Note] InnoDB: Using liburing
+2023-01-09 20:51:40 0 [Note] InnoDB: Initializing buffer pool, total size = 128.000MiB, chunk size = 2.000MiB
+2023-01-09 20:51:40 0 [Note] InnoDB: Completed initialization of buffer pool
+2023-01-09 20:51:40 0 [Note] InnoDB: File system buffers for log disabled (block size=4096 bytes)
+2023-01-09 20:51:41 0 [Note] InnoDB: 128 rollback segments are active.
+2023-01-09 20:51:41 0 [Note] InnoDB: Setting file './ibtmp1' size to 12.000MiB. Physically writing the file full; Please wait ...
+2023-01-09 20:51:41 0 [Note] InnoDB: File './ibtmp1' size is now 12.000MiB.
+2023-01-09 20:51:41 0 [Note] InnoDB: log sequence number 46590; transaction id 14
+2023-01-09 20:51:41 0 [Note] Plugin 'FEEDBACK' is disabled.
+2023-01-09 20:51:41 0 [Warning] 'user' entry 'root@201e875a9759' ignored in --skip-name-resolve mode.
+2023-01-09 20:51:41 0 [Warning] 'proxies_priv' entry '@% root@201e875a9759' ignored in --skip-name-resolve mode.
+2023-01-09 20:51:41 0 [Note] mariadbd: ready for connections.
+Version: '10.10.2-MariaDB-1:10.10.2+maria~ubu2204'  socket: '/run/mysqld/mysqld.sock'  port: 0  mariadb.org binary distribution
+2023-01-09 20:51:41+00:00 [Note] [Entrypoint]: Temporary server started.
+2023-01-09 20:51:46+00:00 [Note] [Entrypoint]: GENERATED ROOT PASSWORD: HKc=):D(TuP:*`wqtk?Kw`8ui^jOd|&F
+2023-01-09 20:51:46+00:00 [Note] [Entrypoint]: Securing system users (equivalent to running mysql_secure_installation)
+
+2023-01-09 20:51:46+00:00 [Note] [Entrypoint]: Stopping temporary server
+2023-01-09 20:51:46 0 [Note] mariadbd (initiated by: unknown): Normal shutdown
+2023-01-09 20:51:46 0 [Note] InnoDB: FTS optimize thread exiting.
+2023-01-09 20:51:46 0 [Note] InnoDB: Starting shutdown...
+2023-01-09 20:51:46 0 [Note] InnoDB: Dumping buffer pool(s) to /var/lib/mysql/ib_buffer_pool
+2023-01-09 20:51:46 0 [Note] InnoDB: Buffer pool(s) dump completed at 230109 20:51:46
+2023-01-09 20:51:46 0 [Note] InnoDB: Removed temporary tablespace data file: "./ibtmp1"
+2023-01-09 20:51:46 0 [Note] InnoDB: Shutdown completed; log sequence number 46590; transaction id 15
+2023-01-09 20:51:46 0 [Note] mariadbd: Shutdown complete
+
+2023-01-09 20:51:46+00:00 [Note] [Entrypoint]: Temporary server stopped
+
+2023-01-09 20:51:46+00:00 [Note] [Entrypoint]: MariaDB init process done. Ready for start up.
+
+2023-01-09 20:51:46 0 [Note] mariadbd (server 10.10.2-MariaDB-1:10.10.2+maria~ubu2204) starting as process 1 ...
+2023-01-09 20:51:46 0 [Note] InnoDB: Compressed tables use zlib 1.2.11
+2023-01-09 20:51:46 0 [Note] InnoDB: Number of transaction pools: 1
+2023-01-09 20:51:46 0 [Note] InnoDB: Using crc32 + pclmulqdq instructions
+2023-01-09 20:51:46 0 [Note] mariadbd: O_TMPFILE is not supported on /tmp (disabling future attempts)
+2023-01-09 20:51:46 0 [Note] InnoDB: Using liburing
+2023-01-09 20:51:46 0 [Note] InnoDB: Initializing buffer pool, total size = 128.000MiB, chunk size = 2.000MiB
+2023-01-09 20:51:46 0 [Note] InnoDB: Completed initialization of buffer pool
+2023-01-09 20:51:46 0 [Note] InnoDB: File system buffers for log disabled (block size=4096 bytes)
+2023-01-09 20:51:46 0 [Note] InnoDB: 128 rollback segments are active.
+2023-01-09 20:51:46 0 [Note] InnoDB: Setting file './ibtmp1' size to 12.000MiB. Physically writing the file full; Please wait ...
+2023-01-09 20:51:46 0 [Note] InnoDB: File './ibtmp1' size is now 12.000MiB.
+2023-01-09 20:51:46 0 [Note] InnoDB: log sequence number 46590; transaction id 14
+2023-01-09 20:51:46 0 [Note] InnoDB: Loading buffer pool(s) from /var/lib/mysql/ib_buffer_pool
+2023-01-09 20:51:46 0 [Note] Plugin 'FEEDBACK' is disabled.
+2023-01-09 20:51:46 0 [Warning] You need to use --log-bin to make --expire-logs-days or --binlog-expire-logs-seconds work.
+2023-01-09 20:51:46 0 [Note] Server socket created on IP: '0.0.0.0'.
+2023-01-09 20:51:46 0 [Note] InnoDB: Buffer pool(s) load completed at 230109 20:51:46
+2023-01-09 20:51:46 0 [Note] Server socket created on IP: '::'.
+2023-01-09 20:51:46 0 [Note] mariadbd: ready for connections.
+Version: '10.10.2-MariaDB-1:10.10.2+maria~ubu2204'  socket: '/run/mysqld/mysqld.sock'  port: 3306  mariadb.org binary distribution
+```
+
+Revisando el output encontraremos que la contraseña random que se generó para este caso fue ```HKc=):D(TuP:*`wqtk?Kw`8ui^jOd|&F```.
+
+Ahora podemos conectarnos mediante TablePlus a la base de datos en el contenedor con la siguiente información:
+
+|Key|Value|
+|--|--|
+|Connection|MariaDB|
+|Name|`mariadb`|
+|Host|`localhost`|
+|Port|`3306`|
+|User|`root`|
+|Password| <code>HKc=):D(TuP:*`wqtk?Kw`8ui^jOd|&F</code> |
+|Database|--|
+
+Si queremos hacer seguimiento en tiempo real a los logs, podemos hacer uso del siguiente comando (podemos simplificar el `--follow` por `-f`):
+
+```txt
+$: docker container logs --follow <id del contenedor>
+```
+
+Si intentamos una conexión erronea o cual movimiento extraño a la base de datos, podremos observar en tiempo real el rechazo que aparece en el log:
+
+```txt
+...
+2023-01-09 21:06:42 4 [Warning] Access denied for user 'root2'@'172.17.0.1' (using password: YES)
 ```
