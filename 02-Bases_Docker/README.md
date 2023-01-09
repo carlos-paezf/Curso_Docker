@@ -73,3 +73,66 @@ For more examples and ideas, visit:
 En el primer paso de la salida anterior se menciona a Docker Daemon, el cual es el servicio en segundo plano que se ejecuta en el host que administra la creación, ejecución y distribución de contenedores Docker. Un contenedor es una instancia de una imagen ejecutándose en un ambiente aislado.
 
 Si ingresamos a Docker Desktop, podremos observar un contenedor que se encuentra con el estado de `EXITED`, ya que la imagen son cumple la función de imprimir algo en consola y terminar su proceso.
+
+## Borrar contenedores e imágenes
+
+Antes de eliminar un contenedor, necesitamos listar los mismos, puesto que, por ejemplo, la imagen de hello-world genera nombres aleatorios, para ello usamos el siguiente comando (la bandera `-a` nos ayuda a listar incluso los que no se están ejecutando):
+
+```txt
+$: docker container ls -a
+```
+
+La manera antigua de listas los containers era con el comando `docker ps`, pero preferimos irnos adaptando a la nueva CLI.
+
+Para eliminar un contenedor podemos hacer uso de su nombre, otra forma es mediante su id o los primeros 3 caracteres del mismo. Por ejemplo al momento de listar los contenedores con el comando `docker container ls -a` se nos muestra el siguiente output:
+
+```txt
+CONTAINER ID   IMAGE         COMMAND   CREATED              STATUS                          PORTS   NAMES
+8d072d59fbd5   hello-world   "/hello"  About a minute ago   Exited (0) About a minute ago           relaxed_moser 
+```
+
+Entonces, a partir de la información anterior podemos eliminar el contenedor de 3 maneras distintas:
+
+1. ```txt
+   $: docker container rm relaxed_moser
+   ```
+
+2. ```txt
+   $: docker container rm 8d072d59fbd5
+   ```
+
+3. ```txt
+   $: docker container rm 8d0
+   ```
+
+Si al momento de listar los contenedores nos encontramos con varios que están detenidos y tenemos la disposición de eliminarlos, podemos usar el siguiente comando:
+
+```txt
+$: docker container prune
+```
+
+Si queremos ser más extremistas y eliminar TODOS los contenedores, incluyendo los que se encuentran corriendo, usaríamos el siguiente comando (Nota 1: no es recomendado. Nota 2: Lo que se encuentra dentro de `$(...)` se puede considerar como un arreglo. Nota 3. La bandera `-f` fuerza la ejecución del comando):
+
+```txt
+$: docker container rm $(docker container ls -a) -f
+```
+
+Para el caso de las imágenes, podemos listar una a una con el siguiente comando:
+
+```txt
+$: docker image ls
+```
+
+Y para hacer la eliminación de cualquiera de ellas, tenemos las mismas opciones de eliminación que tenemos con los contenedores (nombre, id, o 3 primeros caracteres del id):
+
+1. ```txt
+   $: docker image rm hello-world
+   ```
+
+2. ```txt
+   $: docker image rm feb5d9fea6a5
+   ```
+
+3. ```txt
+   $: docker image rm feb
+   ```
