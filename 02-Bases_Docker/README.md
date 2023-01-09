@@ -231,8 +231,34 @@ En la documentación de la imagen nos mencionan las variables de entorno que req
 $: docker container run --name some-postgres -e POSTGRES_PASSWORD=my_password -d postgres
 ```
 
-Por defecto el puerto que se define para el contenedor es el `5432`, podemos definir otro puerto usando la bandera `-p` o `-dp` si queremos definir que también corra en background:
+Por defecto no podemos comunicarnos con ningún puerto con el contenedor, podemos definir un puerto usando la bandera `-p` o `-dp` si queremos definir que también corra en background:
 
 ```txt
 $: docker container run --name some-postgres -e POSTGRES_PASSWORD=my_password -dp 5433:5432 postgres
+```
+
+## Usar la imagen de Postgres
+
+Podemos usar TablePlus para observar la base de datos de nuestro contenedor, en este caso creamos una nueva conexión con los siguiente datos:
+
+|Key|Value|
+|--|--|
+|Connection|Postgres|
+|Name|`some-postgres` (cualquier nombre representativo)|
+|Host|`localhost`|
+|Port|`5433` (puerto definidor por nosotros, o `5432` por default)|
+|User|`postgres` (super-usuario definido por defecto por postgres)|
+|Password|`my_password` (contraseña definida como variable de entorno al momento de crear el contenedor)|
+|Database|(ninguna, puesto que nos conectamos a la database raíz del contenedor)|
+
+Una vez conectados, podemos crear bases de datos, nuevas tablas dentro de las mismas y demás... Es importante recordar que si eliminamos el contenedor toda la información creada se perderá, a menos que creemos un volumen (en próximas secciones).
+
+Para terminar vamos a eliminar el contenedor usado:
+
+```txt
+$: docker container stop some-docker
+```
+
+```txt
+$: docker container rm some-docker
 ```
