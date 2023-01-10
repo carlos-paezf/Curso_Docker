@@ -223,3 +223,66 @@ Como podemos observar en la sección de `"Containers"` del output anterior, tene
 |Server|`world-db`|
 |Username|`example-user`|
 |Password|`user-password`|
+
+## Asignar la red desde la inicialización
+
+Para asignar una red desde la creación del contenedor podemos usar una bandera más en el comando de dicha acción. Por ejemplo, vamos a eliminar los dos contenedores que hemos estado usando, y los vamos a crear nuevamente pero con la asignación de red respectiva:
+
+```txt
+$: docker container ls
+CONTAINER ID   IMAGE                     COMMAND                  CREATED        STATUS          PORTS                    NAMES
+de66bd14ca22   phpmyadmin:5.2.0-apache   "/docker-entrypoint.…"   16 hours ago   Up 49 minutes   0.0.0.0:8080->80/tcp     phpmyadmin
+c38ea860b31f   mariadb:jammy             "docker-entrypoint.s…"   16 hours ago   Up 49 minutes   0.0.0.0:3306->3306/tcp   world-db
+
+$: docker container rm -f de6 c38
+
+$: docker container run \
+    -dp 3306:3306 \
+    --name world-db \
+    --env MARIADB_USER=example-user \
+    --env MARIADB_PASSWORD=user-password \
+    --env MARIADB_ROOT_PASSWORD=root-secret-password \
+    --env MARIADB_DATABASE=world-db \
+    --volume world-db:/var/lib/mysql \
+    --network world-app \
+    mariadb:jammy
+5c52d08b661641c9606592cd1203ed5efdd99993d645d8ae614eb61b5f252657
+
+$: docker run \
+    -dp 8080:80 \
+    --name phpmyadmin \
+    --env PMA_ARBITRARY=1 \
+    --network world-app \
+    phpmyadmin:5.2.0-apache
+328a536ffd929fb1f0b108ebca52e56bc1e363408c1adc4f88d9a496019e78b3
+```
+
+Regresamos al navegador y volvemos a usar las credenciales para el ingreso al contenedor de la base de datos. Recordemos que los registros guardados en la base de datos son persistentes gracias al volumen que se creo, y como se está haciendo la asignación de red de manera directa, entonces podemos comunicar los contenedores que antes estaban aislados.
+
+El problema dentro de Docker Desktop es que no podemos identificar cuales contenedores están relacionados en la misma red, por lo que tendríamos que inspeccionar la red mediante el commando `inspect`.
+
+Para finalizar este laboratorio, vamos a hacer la limpieza de containers, volumes y networks:
+
+```txt
+$: docker container ls
+
+$: docker container rm -f 5c5 328
+
+$: docker volume ls
+
+$: docker volume rm world-db
+
+$: docker network ls
+
+$: docker network rm world-app
+```
+
+También podemos hacer la limpieza con otros comandos, pero debemos estar seguros de que lo que estamos eliminando sea unicamente lo creado en esta sección, no queremos eliminar elementos que se estén usando en otros proyectos, se podría decir que los comandos a continuación sirven solo si estamos aprendiendo con esta guía:
+
+```txt
+$: docker container rm -f $(docker container ls)
+
+$: docker volume prune
+
+$: docker network prune
+```
