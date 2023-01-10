@@ -133,3 +133,93 @@ $: docker run \
 ```
 
 Una vez creado el contenedor, ingresamos en un navegador a la dirección `localhost:8080` podremos observar la interfaz de la aplicación de phpMyAdmin. Nosotros no podemos comunicar los 2 contenedores puesto que no están dentro de la misma red, ya que ambos se encuentran aislados entre ellos.
+
+## Redes de contenedores
+
+Necesitamos conectar los contenedores que creamos en secciones pasadas (la base de datos y phpMyAdmin). Para crear una red usamos el siguiente comando:
+
+```txt
+$: docker network create world-app
+```
+
+Podemos listar las redes usando el comando a continuación:
+
+```txt
+$: docker network ls
+```
+
+Para conectar los contenedores en una misma red usamos el siguiente comando:
+
+```txt
+$: docker container ls
+CONTAINER ID   IMAGE                     COMMAND                  CREATED        STATUS         PORTS                    NAMES
+de66bd14ca22   phpmyadmin:5.2.0-apache   "/docker-entrypoint.…"   15 hours ago   Up 7 minutes   0.0.0.0:8080->80/tcp     phpmyadmin
+c38ea860b31f   mariadb:jammy             "docker-entrypoint.s…"   15 hours ago   Up 7 minutes   0.0.0.0:3306->3306/tcp   world-db
+
+$: docker network connect world-app de6
+$: docker network connect world-app c38
+```
+
+Podemos inspeccionar la red con el siguiente comando:
+
+```txt
+$: docker network inspect world-app
+```
+
+Con el comando anterior obtenemos una salida similar a la siguiente:
+
+```txt
+[
+    {
+        "Name": "world-app",
+        "Id": "0cdcc44e40f6d3f5786645db1b5ea47126d11fb187fdf640a0114384fb75b089",
+        "Created": "2023-01-10T15:15:33.8849804Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "c38ea860b31fcd47b77c8bf0f34228b02d17d4457cbbb6730e5cdc5b967fde06": {
+                "Name": "world-db",
+                "EndpointID": "05c51781b577bfe58bca1bfa775480f88b61a28377f9292f6b6789cc213c2087",
+                "MacAddress": "02:42:ac:12:00:03",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            },
+            "de66bd14ca2270c3538e8ad669f2613bb27bb47bfd1b90026e3c89113c3d0e4a": {
+                "Name": "phpmyadmin",
+                "EndpointID": "04c4b9629d43bca00a72bb2daeb45306e6a4eb6b9bc78a2162b7f6458c9cd2e2",
+                "MacAddress": "02:42:ac:12:00:02",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
+```
+
+Como podemos observar en la sección de `"Containers"` del output anterior, tenemos conectados correctamente los 2 contenedores que necesitamos, y si vamos a `localhost:8080` e ingresamos con los datos de abajo en el login de phpMyAdmin, tendremos acceso a la base de datos de world-db.
+
+|Key|Value|
+|--|--|
+|Server|`world-db`|
+|Username|`example-user`|
+|Password|`user-password`|
