@@ -61,3 +61,55 @@ Para esta lección necesitamos seguir los siguientes pasos:
 
 3. En la consola de Table Plus se copio todo el contenido del [archivo adjunto](world-221207-123207.sql), se seleccionó todo y posteriormente se presionó la opción de `Run Current`.
 4. Ahora recargamos la aplicación de Table Plus y podemos observar las tablas `country` y `countrylanguage` e internamente los registros para cada uno.
+
+## Tipos de volúmenes
+
+Hay 3 tipos de volúmenes:
+
+1. Named Volumes: Son completamente manejados por Docker
+2. Bind Volumes: Dependen de la estructura del directorio y del sistema operativo del la maquina Host
+3. Anonymous Volumes: Solo se le especifica el path del contenedor y Docker lo asigna automáticamente al host.
+
+Vamos a crear un espacio persistente en nuestro equipo, es decir un volumen, para lo cual usamos el siguiente comando:
+
+```txt
+$: docker volume create world-db
+```
+
+Podemos inspeccionar el contenido del mismo con el siguiente comando:
+
+```txt
+$: docker volume inspect world-db
+```
+
+Ahora, vamos a usar el volumen, pero primero necesitamos copiar el comando para crear el contenedor de la [sección anterior](README.md#solución), y le añadimos una nueva bandera para indicarle que se guarde en el volumen creado, dicha bandera requiere de la sintaxis `<volumen en el host>:<ubicación del volumen en docker>`, para la segunda parte de la sintaxis podemos consultar dentro de la documentación oficial de la imagen:
+
+```txt
+$: docker container run \
+    -dp 3306:3306 \
+    --name world-db \
+    -e MARIADB_USER=example-user \
+    -e MARIADB_PASSWORD=user-password \
+    -e MARIADB_ROOT_PASSWORD=root-secret-password \
+    -e MARIADB_DATABASE=world-db \
+    --volume world-db:/var/lib/mysql \
+    mariadb:jammy
+```
+
+Una vez hemos creado el nuevo contenedor, debemos hacer de nuevo el volcado de los registros dentro de la base de datos. Ahora vamos a ver la efectividad del volumen. Vamos a eliminar el contenedor y lo volvemos a crear apuntando a la dirección del volumen:
+
+```txt
+$: docker container rm -f 873
+
+$: docker container run \
+    -dp 3306:3306 \
+    --name world-db \
+    -e MARIADB_USER=example-user \
+    -e MARIADB_PASSWORD=user-password \
+    -e MARIADB_ROOT_PASSWORD=root-secret-password \
+    -e MARIADB_DATABASE=world-db \
+    --volume world-db:/var/lib/mysql \
+    mariadb:jammy
+```
+
+Si volvemos a Table Plus podremos observar que la base de datos se ha mantenido y su información se ha persistido.
