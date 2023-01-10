@@ -113,3 +113,23 @@ $: docker container run \
 ```
 
 Si volvemos a Table Plus podremos observar que la base de datos se ha mantenido y su información se ha persistido.
+
+## phpMyAdmin
+
+Para esta sección necesitamos mantener tanto con container como el volumen generados en la [sección pasada](README.md#tipos-de-volúmenes). Vamos a usar la `phpmyadmin` con el fin de tener una interfaz web para una base de datos mySQL o MariaDB:
+
+```txt
+$: docker pull phpmyadmin:5.2.0-apache
+```
+
+Ahora crearemos un contenedor que haga uso de un servidor arbitrario (según la propia documentación de la imagen) con el siguiente comando:
+
+```txt
+$: docker run \
+    --name phpmyadmin \
+    -dp 8080:80 \
+    -e PMA_ARBITRARY=1 \
+    phpmyadmin:5.2.0-apache
+```
+
+Una vez creado el contenedor, ingresamos en un navegador a la dirección `localhost:8080` podremos observar la interfaz de la aplicación de phpMyAdmin. Nosotros no podemos comunicar los 2 contenedores puesto que no están dentro de la misma red, ya que ambos se encuentran aislados entre ellos.
