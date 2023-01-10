@@ -286,3 +286,29 @@ $: docker volume prune
 
 $: docker network prune
 ```
+
+## Bind Volumes
+
+Para esta práctica necesitamos usar el [proyecto ajunto](nest-graphql). Ahora bien, necesitamos ejecutar el proyecto en un entorno diferente al local, lo cual implica la instalación de dependencias dentro de dicho entorno. Lo primero que vamos a hacer es buscar una versión especifica de NodeJS dentro de Docker Hub, posterior a ello creamos un contenedor para nuestro proyecto que tendrá diversos flags en el comando (es importante que estemos dentro del directorio del proyecto):
+
+- `--name` nombre del contenedor
+- `-w` working directory o directorio de trabajo en el cual se ubica el proyecto dentro del contenedor
+- `-p` mapeo del puerto 80 en el host con el puerto 3000 del contenedor
+- `-v` volumen que usa el comando de consulta de directorio actual en Linux (`pwd`) y lo mapea con la dirección `/app` dentro del contenedor
+- `sh -c` comando en el shell del contenedor, en este caso le indicamos que haga la instalación de las dependencias e inicie la aplicación, esto se hace para que no solo termine cuando se haya levantado la imagen.
+
+> En caso de trabajar con GitBash en Windows es importante ejecutar este comando una única vez por sesión `export MSYS_NO_PATHCONV=1`
+
+```txt
+$: docker container run \
+    --name nest-app \
+    -w /app \
+    -p 80:3000 \
+    -v "$(pwd)":/app \
+    node:16-alpine3.16 \
+    sh -c "npm install && npm run start:dev"
+```
+
+Gracias a los bind volumes, cualquier cosa que ocurra dentro de un directorio, se verá reflejado en el otro, es decir, nosotros enlazamos el directorio de nuestro proyecto con un directorio llamado `/app` dentro del contenedor. Cada que ocurra algo dentro del directorio `/app` se verá reflejado en nuestro directorio local, por ejemplo, la instalación de las dependencias.
+
+Ahora podemos ingresar a la aplicación desde nuestro equipo host si usamos la dirección `localhost:80` y con un endpoint como por ejemplo `/graphql`. Para terminar eliminamos el contenedor y el directorio `/node_modules` que se generó dentro del proyecto.
