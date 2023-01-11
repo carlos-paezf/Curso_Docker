@@ -423,3 +423,34 @@ export class HelloWorldResolver {
 ```
 
 Si revisamos nuestro archivo en host, podemos observar que se ha aplicado el cambio que realizamos desde el contenedor. Cualquier modificación en el proyecto que hagamos en el container, se verá reflejado en el proyecto alojado en host, igual en la vía contraria, todo ello gracias a los volúmenes enlazados.
+
+## Limpieza de lo realizado en la sección
+
+Vamos a limpiar todo lo realizado en la sección, para lo cual usaremos los siguientes comandos:
+
+```txt
+$: docker container rm -f nest-app
+nest-app
+
+$: docker image ls
+REPOSITORY   TAG             IMAGE ID       CREATED        SIZE
+phpmyadmin   5.2.0-apache    bc444490f73f   5 days ago     510MB
+postgres     15-alpine       95a70c53337a   2 weeks ago    243MB
+node         16-alpine3.16   cdb7a20a9b54   4 weeks ago    116MB
+mariadb      jammy           a748acbaccae   4 weeks ago    410MB
+
+$: docker image rm bc4 95a cdb a74
+bc4 
+95a 
+cdb 
+a74
+
+$: docker network prune
+WARNING! This will remove all custom networks not used by at least one container.
+Are you sure you want to continue? [y/N] y
+
+$: docker volume prune
+WARNING! This will remove all local volumes not used by at least one container.
+Are you sure you want to continue? [y/N] y
+Total reclaimed space: 0B
+```
