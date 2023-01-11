@@ -385,3 +385,41 @@ export class HelloWorldResolver {
 ```
 
 El contenedor debe actualizarse con la información que acabamos de modificar, por lo que al hacer de nuevo la petición en GraphQL tendremos que ver reflejada la nueva respuesta. Con lo anterior logramos que no requerimos de una maquina virtual para añadir y modificar el proyecto, solo enlazamos un volumen entre el directorio local y un directorio dentro del contenedor.
+
+## Terminal interactiva -it
+
+Mientras tenemos el contenedor con la aplicación corriendo vamos a abrir una nueva instancia de la terminal, dentro de la cual vamos a ejecutar el siguiente comando:
+
+```txt
+$: docker exec -it nest-app /bin/sh
+```
+
+En caso de que aparezca el error `OCI runtime exec failed: exec failed: unable to start container process: exec: "C:/Program Files/Git/usr/bin/sh": stat C:/Program Files/Git/usr/bin/sh: no such file or directory: unknown`, debemos ejecutar el siguiente comando cada que se lance una nueva terminal:
+
+```txt
+$: export MSYS_NO_PATHCONV=1
+```
+
+Una vez se abra un tipo de consola tendremos acceso al directorio de `/app` y claramente todo nuestro proyecto. Vamos a ejecutar los siguientes comando dentro de la consola interactiva:
+
+```txt
+$: cd src/hello-world
+
+$: vi hello-world.resolver.ts
+```
+
+Esto nos va a permitir abrir un editar en línea de comandos para editar el archivo, dentro del cual haremos una modificación y observaremos su afectación dentro del directorio host de nuestro equipo (debemos movernos con el flechas direccionales, hacer uso de la tecla `i` para realizar cambios, una vez se terminen los cambios presionamos `esc`, y para salir y guardar cambios usamos la combinación `:wq`):
+
+```ts
+@Resolver()
+export class HelloWorldResolver {
+
+    @Query( () => String, { description: 'Hola Mundo es lo que retorna', name: 'hello' } )
+    helloWorld (): string {
+        return 'Hola Mundo - Desde mi contenedor'
+    }
+    ...
+}
+```
+
+Si revisamos nuestro archivo en host, podemos observar que se ha aplicado el cambio que realizamos desde el contenedor. Cualquier modificación en el proyecto que hagamos en el container, se verá reflejado en el proyecto alojado en host, igual en la vía contraria, todo ello gracias a los volúmenes enlazados.
