@@ -311,4 +311,77 @@ $: docker container run \
 
 Gracias a los bind volumes, cualquier cosa que ocurra dentro de un directorio, se verá reflejado en el otro, es decir, nosotros enlazamos el directorio de nuestro proyecto con un directorio llamado `/app` dentro del contenedor. Cada que ocurra algo dentro del directorio `/app` se verá reflejado en nuestro directorio local, por ejemplo, la instalación de las dependencias.
 
-Ahora podemos ingresar a la aplicación desde nuestro equipo host si usamos la dirección `localhost:80` y con un endpoint como por ejemplo `/graphql`. Para terminar eliminamos el contenedor y el directorio `/node_modules` que se generó dentro del proyecto.
+Ahora podemos ingresar a la aplicación desde nuestro equipo host si usamos la dirección `localhost:80` y con un endpoint como por ejemplo `/graphql`. Para terminar eliminamos el contenedor.
+
+## Probar el enlace de directorios
+
+Vamos a volver a lanzar el comando de la sección anterior. Si no eliminamos la carpeta `/dist` o la carpeta `/node_modules`, el contenedor será lanzado más rápido.
+
+```txt
+$: docker container run \
+    --name nest-app \
+    -w /app \
+    -p 80:3000 \
+    -v $(pwd):/app \
+    node:16-alpine3.16 \
+    sh -c "npm install && npm run start:dev"
+```
+
+Vamos a comprobar que todo funciona ingresando a la dirección de `localhost/graphql` y haciendo la siguiente consulta al servidor:
+
+```graphql
+{
+    hello
+    todos {
+        description
+        id
+    }
+}
+```
+
+La respuesta que obtendremos será la siguiente:
+
+```json
+{
+    "data": {
+        "hello": "Hola Mundo",
+        "todos": [
+            {
+                "description": "Piedra del Alma",
+                "id": 1
+            },
+            {
+                "description": "Piedra del Espacio",
+                "id": 2
+            },
+            {
+                "description": "Piedra del Poder",
+                "id": 3
+            },
+            {
+                "description": "Piedra del Tiempo",
+                "id": 4
+            },
+            {
+                "description": "Piedra desde el contenedor",
+                "id": 5
+            }
+        ]
+    }
+}
+```
+
+Ahora, dentro de archivo `hello-world.resolver.ts` vamos ha modificar uno de los métodos desde nuestro equipo host:
+
+```ts
+@Resolver()
+export class HelloWorldResolver {
+    @Query( () => String, { description: 'Hola Mundo es lo que retorna', name: 'hello' } )
+    helloWorld(): string {
+        return 'Hola Mundo - Desde mi equipo host';
+    }
+    ...
+}
+```
+
+El contenedor debe actualizarse con la información que acabamos de modificar, por lo que al hacer de nuevo la petición en GraphQL tendremos que ver reflejada la nueva respuesta. Con lo anterior logramos que no requerimos de una maquina virtual para añadir y modificar el proyecto, solo enlazamos un volumen entre el directorio local y un directorio dentro del contenedor.
