@@ -149,3 +149,16 @@ $: docker compose up
 ```
 
 Lo que vamos a notar es que no hace uso del volumen que creamos en el laboratorio, si no que crea un volumen con la nomenclatura de `<nombre del directorio>-postgres-db`. Lo que queremos es que haga uso del volumen que habíamos creado con anterioridad, y esto lo veremos en la próxima lección.
+
+## Limpiar el docker compose y conectar volumen externo
+
+Ya que no queremos un volumen nuevo, sino el que teníamos con anterioridad, vamos a cancelar el proceso del `docker compose up` y vamos a añadir un nuevo cambio dentro del archivo yaml (en algunos casos es necesario limpiar todo lo creado por el archivo con el fin de que reconozca los cambios, eso se puede hacer con `docker compose down`, excepto el volumen que si toca eliminar de manera manual):
+
+```yaml
+...
+volumes:
+    postgres-db:
+        external: true
+```
+
+Cuando volvemos a usar el comando de `docker compose up`, se levantarán lo contenedores y podremos observar mediante el comando de listado de volúmenes, que estamos haciendo uso del volumen anterior, y mediante el listado de redes y el comando `inspect` observaremos que de manera automática tenemos una red que conecta los 2 servicios del archivo.
