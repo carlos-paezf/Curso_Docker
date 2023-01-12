@@ -189,3 +189,34 @@ services:
             - ./pgadmin:/var/lib/pgadmin
         ...
 ```
+
+## Multi-Container app - Base de datos Mongo
+
+Vamos a crear un nuevo directorio dentro dentro del cual creamos un nuevo archivo `docker-compose.yaml` y un `.env`. Dentro del primer archivo añadimos las siguientes instrucciones para crear un contenedor con la imagen de mongo:
+
+```yaml
+version: '3'
+
+services:
+    mongo_db:
+        container_name: pokemon_db
+        image: mongo:6.0
+        volumes:
+            - poke-vol:/data/db
+        ports:
+            - 27017:27017
+        restart: always
+
+volumes:
+    poke-vol:
+        external: false
+```
+
+Una vez se haya descargado la imagen y se haya levantado el contenedor, vamos a TablePlus y testeamos la conexión con los siguientes datos:
+
+| Key | Value |
+| --- | ----- |
+| Name | `temporal-pokeapp` |
+| URL | `mongodb://localhost:27017` |
+
+Una vez comprado que si funciona, entonces bajamos lo creado con  `docker compose down`.
