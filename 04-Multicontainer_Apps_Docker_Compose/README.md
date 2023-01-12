@@ -152,7 +152,7 @@ Lo que vamos a notar es que no hace uso del volumen que creamos en el laboratori
 
 ## Limpiar el docker compose y conectar volumen externo
 
-Ya que no queremos un volumen nuevo, sino el que teníamos con anterioridad, vamos a cancelar el proceso del `docker compose up` y vamos a añadir un nuevo cambio dentro del archivo yaml (en algunos casos es necesario limpiar todo lo creado por el archivo con el fin de que reconozca los cambios, eso se puede hacer con `docker compose down`, excepto el volumen que si toca eliminar de manera manual):
+Ya que no queremos un volumen nuevo, sino el que teníamos con anterioridad, vamos a cancelar el proceso del `docker compose up` y vamos a añadir un nuevo cambio dentro del archivo yaml (en algunos casos es necesario limpiar todo lo creado por el archivo con 7yZDFel fin de que reconozca los cambios, eso se puede hacer con `docker compose down`, excepto el volumen que si toca eliminar de manera manual):
 
 ```yaml
 ...
@@ -162,3 +162,30 @@ volumes:
 ```
 
 Cuando volvemos a usar el comando de `docker compose up`, se levantarán lo contenedores y podremos observar mediante el comando de listado de volúmenes, que estamos haciendo uso del volumen anterior, y mediante el listado de redes y el comando `inspect` observaremos que de manera automática tenemos una red que conecta los 2 servicios del archivo.
+
+## Bind Volumes - Docker Compose
+
+Lo primero que haremos será usar el comando `docker compose down` para eliminar todo lo creo el archivo, posteriormente eliminamos los volumes inactivos con el comando `docker volume prune`. Lo que haremos a continuación es comentar las líneas relacionadas a volumes dentro del archivo de `docker-compose.yaml`, luego añadimos una línea dentro de `volumes` en el primer servicio, con el fin de enlazar a un directorio del equipo host:
+
+```yaml
+...
+services:
+    db:
+        ...
+        volumes:
+            - ./postgres:/var/lib/postgresql/data
+        ...
+```
+
+Con esto procuramos que se conecte con el directorio host de `postgres`. Cuando ejecutamos el comando para levantar el archivo, si no tenemos la carpeta, se creará de manera automática y además guardará la información que se va añadiendo en el directorio de `/var/lib/postgresql/data`. Si ejecutamos el comando `docker compose down`, vamos a observar que la carpeta `postgres` en el equipo host se va a mantener y servirá para persistir la información en una próxima subida del archivo con sus servicios. Podemos aplicar la misma idea de persistir en un volumen la información del servicio de pgAdmin, y por ejemplo, la configuración de un servidor será guardada dentro del volumen:
+
+```yaml
+...
+services:
+    ...
+    pgAdmin:
+        ...
+        volumes:
+            - ./pgadmin:/var/lib/pgadmin
+        ...
+```
