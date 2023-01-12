@@ -131,3 +131,21 @@ services:
             - PGADMIN_DEFAULT_PASSWORD=123456
             - PGADMIN_DEFAULT_EMAIL=batman@justiceleague.com
 ```
+
+## Correr, limpiar y otras consideraciones - Docker Compose
+
+Podemos indicarle a nuestro archivo de `docker-compose.yaml` que cree o haga uso de un volumen para el contenedor de la base de datos:
+
+```yaml
+...
+volumes:
+    postgres-db:
+```
+
+Para ejecutar nuestro archivo debemos ubicarnos en el directorio que lo almacena y abrir una instancia de la terminal para ejecutar el siguiente comando:
+
+```txt
+$: docker compose up
+```
+
+Lo que vamos a notar es que no hace uso del volumen que creamos en el laboratorio, si no que crea un volumen con la nomenclatura de `<nombre del directorio>-postgres-db`. Lo que queremos es que haga uso del volumen que habíamos creado con anterioridad, y esto lo veremos en la próxima lección.

@@ -19,3 +19,6 @@ services:
         environment:
             - PGADMIN_DEFAULT_PASSWORD=123456
             - PGADMIN_DEFAULT_EMAIL=batman@justiceleague.com
+
+volumes:
+    postgres-db:
