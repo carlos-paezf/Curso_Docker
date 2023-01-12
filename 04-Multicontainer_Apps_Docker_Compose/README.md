@@ -98,3 +98,36 @@ Para este laboratorio seguiremos los siguientes pasos:
 10. Eliminar el contenedor de postgres y probar de nuevo en pgAdmin que el servidor ya no logre conectarse.
 11. Recrear el contenedor.
 12. Conectar el contenedor en la red como en el paso 8 y probar que la información si se haya persistido en el volumen al hacer uso nuevamente de pdAdmin
+
+## Docker Compose - Multi Container Apps
+
+Vamos a eliminar los contenedores del laboratorio anterior, pero vamos a conservar el volumen y network. Ahora vamos a crear un nuevo archivo llamado `docker-compose.yaml` (también se puede usar la extensión `.yml`). En dicho archivo vamos a añadir las siguientes instrucciones:
+
+1. Indicamos la versión de comandos que debe reconocer Docker (la versión legacy es la `2.x`, la versión más reciente es la `3.x`).
+2. Indicamos mediante el comando `services` que vamos a crear los contenedores.
+3. Se instancia el contenedor con la base de datos, el cual tendrá cómo nombre de servicio `db`, definimos el nombre del container, la imagen que debe emplear, el volumen en el cual se va a persistir la data y las variables de entorno relacionadas al contenedor
+4. Creamos el servicio `pdAdmin` el cual depende de que el servicio `db` haya sido levantado. Definimos el nombre del contenedor, la imagen, el puerto expuesto de nuestro equipo mapeado con el puerto del contenedor, por último añadimos las variables de entorno asignadas para el container.
+
+```yaml
+version: '3'
+
+services:
+    db:
+        container_name: postgres_database
+        image: postgres:15.1
+        volumes:
+            - postgres-db:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_PASSWORD=123456
+
+    pgAdmin:
+        depends_on:
+            - db
+        container_name: pdAdmin
+        image: dpage/pgadmin4:6.18
+        ports:
+            - 8080:80
+        environment:
+            - PGADMIN_DEFAULT_PASSWORD=123456
+            - PGADMIN_DEFAULT_EMAIL=batman@justiceleague.com
+```

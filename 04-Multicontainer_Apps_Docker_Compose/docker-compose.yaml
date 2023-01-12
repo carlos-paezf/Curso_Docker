@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+    db:
+        container_name: postgres_database
+        image: postgres:15.1
+        volumes:
+            - postgres-db:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_PASSWORD=123456
+
+    pgAdmin:
+        depends_on:
+            - db
+        container_name: pdAdmin
+        image: dpage/pgadmin4:6.18
+        ports:
+            - 8080:80
+        environment:
+            - PGADMIN_DEFAULT_PASSWORD=123456
+            - PGADMIN_DEFAULT_EMAIL=batman@justiceleague.com
