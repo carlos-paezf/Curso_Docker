@@ -220,3 +220,59 @@ Una vez se haya descargado la imagen y se haya levantado el contenedor, vamos a 
 | URL | `mongodb://localhost:27017` |
 
 Una vez comprado que si funciona, entonces bajamos lo creado con  `docker compose down`.
+
+## Variables de entorno - MongoDB
+
+Vamos a añadir a nuestro contenedor las variables de entorno para el usuario y el password:
+
+```yaml
+services:
+    mongo_db:
+        ...
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: mongoadmin
+            MONGO_INITDB_ROOT_PASSWORD: mongoadmin
+...
+```
+
+Otra configuración será que se obligue la autenticación para el ingreso a la base de datos del contenedor. En la documentación de la imagen de Mongo dice que se debe usar el comando `--auth`, por lo tanto dentro de la configuración del servicio en el archivo `docker-compose.yaml` añadimos la instrucción `command`:
+
+```yaml
+services:
+    mongo_db:
+        ...
+        command: [ '--auth' ]
+...
+```
+
+Si intentamos ejecutar el archivo, no va a generar ningún error al momento de la creación del contenedor con la base de datos. Pero cuando intentamos ingresar a la base de datos con los datos de abajo, nos dará un error de autenticación, y esto se debe a que las variables de usuario y password se establecen en el momento de la inicialización de la base de datos, paso que no está ocurriendo en estos momentos puesto que habíamos almacenado la información en un volumen, pero nos indica que el comando `--auth` si se está aplicando. Para arreglar este error debemos bajar el docker compose y eliminar el volumen asociado, y volver a subir el archivo.
+
+| Key | Value |
+| --- | ----- |
+| Name | `temporal-pokeapp` |
+| URL | `mongodb://<usuario>:<password>@localhost:27017` |
+
+Ahora, vamos a darle el toque de seguridad usando las variables de entorno desde el archivo `.env`. Por ejemplo definimos que como variables de entorno tengamos el usuario, la contraseña y el nombre de la base de datos:
+
+```.env
+MONGO_USERNAME = admin
+MONGO_PASSWORD = 1234567890
+MONGO_DATABASE = pokemon_database
+```
+
+Para hacer uso de dichas variables dentro del archivo `docker-compose.yaml` debemos emplear la sintaxis `${var}`:
+
+```yaml
+...
+services:
+    mongo_db:
+        container_name: ${MONGO_DATABASE}
+        ...
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+        ...
+...
+```
+
+Ahora, bajamos el docker compose y eliminamos el volumen asociado, con el fin de que se puedan tomar las nuevas configuraciones. Cuando se levante de nuevo el archivo, podremos hacer el test con las nuevas variables definidas.

@@ -2,13 +2,17 @@ version: '3'
 
 services:
     mongo_db:
-        container_name: pokemon_db
+        container_name: ${MONGO_DATABASE}
         image: mongo:6.0
         volumes:
             - poke-vol:/data/db
         ports:
             - 27017:27017
         restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+        command: [ '--auth' ]
 
 volumes:
     poke-vol:
