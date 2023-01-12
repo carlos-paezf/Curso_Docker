@@ -276,3 +276,28 @@ services:
 ```
 
 Ahora, bajamos el docker compose y eliminamos el volumen asociado, con el fin de que se puedan tomar las nuevas configuraciones. Cuando se levante de nuevo el archivo, podremos hacer el test con las nuevas variables definidas.
+
+## Multi-container app - Visor de Base de Datos
+
+Vamos a buscar la imagen oficial de mongo-express en Docker Hub, y configuramos las instrucciones para crear el contenedor con la imagen:
+
+```yaml
+version: '3'
+
+services:
+    ...
+    mongo-express:
+        depends_on:
+            - mongo_db
+        image: mongo-express:1.0.0-alpha.4
+        environment:
+            ME_CONFIG_MONGODBADMINUSERNAME: ${MONGO_USERNAME}
+            ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+            ME_CONFIG_MONGODB_SERVER: ${MONGO_DATABASE}
+        ports:
+            - 8080:8081
+        restart: always
+...
+```
+
+Levantamos el docker compose y ahora podremos ingresar en un navegador a `localhost:8080`, en el cual encontraremos un dashboard básico para el servidor de la base de datos y por medio del cual podremos realizar las acciones necesarias. Para mantener un estándar de seguridad un poco más alto, vamos a evitar exponer el puerto del contenedor de la base de datos, con el fin de que solo los contenedores que se encuentren dentro de la misma red se puedan comunicar solo entre ellos.
