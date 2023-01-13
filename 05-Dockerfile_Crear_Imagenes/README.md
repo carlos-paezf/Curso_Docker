@@ -126,3 +126,74 @@ $: docker image ls
 REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
 cron-ticker   latest    9819877b548f   2 minutes ago   173MB
 ```
+
+## Reconstruir una imagen
+
+En ocasiones requerimos reconstruir una imagen, ya sea por errores o por actualizaciones. Lo único que debemos hacer es volver a usar el comando de construcción. Por ejemplo vamos a actualizar nuestro archivo Dockerfile al siguiente orden:
+
+```dockerfile
+FROM node:19.2-alpine3.16
+
+WORKDIR /app
+
+COPY package.json ./
+
+RUN npm install
+
+COPY src/app.js ./
+
+CMD [ "node", "app.js" ]
+```
+
+Los pasos que no presentan cambios quedan en cache, por lo tanto solo los pasos que se modifican y sus siguientes crearán nuevas capas en la imagen.
+
+Podemos definir la versión de la imagen que se va a crear y que no quede sin identificarse. Por ejemplo, si usamos el comando a continuación, vamos a crear la versión 1.0 de la imagen y en ese momento a su vez será la versión latest:
+
+```txt
+$: docker build -t cron-ticker:1.0.0 .
+
+$: docker image ls
+REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
+cron-ticker   1.0.0     fa423894d3df   9 seconds ago   173MB
+```
+
+Si añadimos un cambio y deseamos volver a actualizar la imagen, ejecutamos el siguiente comando y veremos que convertimos esta nueva versión en la latest:
+
+```txt
+$: docker build -t cron-ticker:1.0.1 .
+
+$: docker image ls
+REPOSITORY    TAG       IMAGE ID       CREATED          SIZE
+cron-ticker   1.0.1     fa423894d3df   3 minutes ago    173MB
+cron-ticker   1.0.0     9819877b548f   28 minutes ago   173MB
+```
+
+Si queremos actualizar el tag de una imagen usamos el siguiente comando:
+
+```txt
+$: docker image tag cron-ticker:1.0.1 cron-ticker:boom
+
+$: docker image ls
+REPOSITORY    TAG       IMAGE ID       CREATED          SIZE
+cron-ticker   1.0.1     fa423894d3df   5 minutes ago    173MB
+cron-ticker   boom      fa423894d3df   5 minutes ago    173MB
+cron-ticker   1.0.0     9819877b548f   31 minutes ago   173MB
+```
+
+Otro ejemplo es en el caso que construyamos una imagen sin tag, pero que no tenga diferencias con la anterior. Se va a crear una versión con el tag `latest`:
+
+```txt
+$: docker build cron-ticker:1.0.2 .
+
+$: docker build cron-ticker .
+
+$: docker image ls
+REPOSITORY    TAG       IMAGE ID       CREATED          SIZE
+cron-ticker   1.0.2     5553c2b0914a   31 seconds ago   173MB
+cron-ticker   latest    5553c2b0914a   31 seconds ago   173MB
+cron-ticker   1.0.1     fa423894d3df   6 minutes ago    173MB
+cron-ticker   boom      fa423894d3df   6 minutes ago    173MB
+cron-ticker   1.0.0     9819877b548f   32 minutes ago   173MB
+```
+
+Para ejecutar una imagen en una versión especifica, construimos el contenedor definiendo la imagen como `cron-ticker:<version>`, sino se define se hará uso de la latest.
