@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-    mongo_db:
+    mongo-db:
         container_name: ${MONGO_DATABASE}
         image: mongo:6.0
         volumes:
@@ -16,7 +16,7 @@ services:
 
     mongo-express:
         depends_on:
-            - mongo_db
+            - mongo-db
         image: mongo-express:1.0.0-alpha.4
         environment:
             ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
@@ -24,6 +24,19 @@ services:
             ME_CONFIG_MONGODB_SERVER: ${MONGO_DATABASE}
         ports:
             - 8080:8081
+        restart: always
+
+    poke-app:
+        depends_on:
+            - mongo-db
+            - mongo-express
+        container_name: poke-app-nest
+        image: klerith/pokemon-nest-app:1.0.0
+        ports:
+            - 3000:3000
+        environment:
+            MONGODB: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_DATABASE}:27017
+            DB_NAME: ${MONGO_DATABASE}
         restart: always
 
 volumes:

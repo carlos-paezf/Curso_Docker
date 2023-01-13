@@ -301,3 +301,28 @@ services:
 ```
 
 Levantamos el docker compose y ahora podremos ingresar en un navegador a `localhost:8080`, en el cual encontraremos un dashboard básico para el servidor de la base de datos y por medio del cual podremos realizar las acciones necesarias. Para mantener un estándar de seguridad un poco más alto, vamos a evitar exponer el puerto del contenedor de la base de datos, con el fin de que solo los contenedores que se encuentren dentro de la misma red se puedan comunicar solo entre ellos.
+
+## Multi-container app - Aplicación de Nest
+
+Vamos a instanciar un tercer contenedor llamado [pokemon-nest-app](https://hub.docker.com/r/klerith/pokemon-nest-app), el cual consiste de un backend en nest. Para configurar el contenedor dentro del archivo `docker-compose.yaml` añadimos la siguiente instrucción:
+
+```yaml
+...
+services:
+    ...
+    poke-app:
+        depends_on:
+            - mongo-db
+            - mongo-express
+        container_name: poke-app-nest
+        image: klerith/pokemon-nest-app:1.0.0
+        ports:
+            - 3000:3000
+        environment:
+            MONGODB: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_DATABASE}:27017
+            DB_NAME: ${MONGO_DATABASE}
+        restart: always
+...
+```
+
+Cuando lanzamos el comando `docker compose up -d`, se va a descargar la imagen si no se encuentra, y una vez reconocidas las configuraciones, podremos ingresar a los endpoints que indica la documentación de la imagen, en especial `http://localhost:3000/api/v2/seed` con el fin de "generar" y cargar los registros en la base de datos.
