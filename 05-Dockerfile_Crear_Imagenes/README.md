@@ -84,7 +84,45 @@ Vamos a crear el archivo `Dockerfile` dentro del directorio del proyecto, con el
 3. Le damos la instrucción de cuales archivos se deben copiar, y el directorio en que debe guardarlos (cómo en el paso anterior definimos el directorio de trabajo, le vamos a indicar que se quede en el mismo):
 
    ```Dockerfile
-   COPY app.js package.json ./
+   COPY src/app.js package.json ./
    ```
 
 Las anteriores instrucciones son las más usadas dentro de las construcción de imágenes de proyectos. En la próxima lección vamos a ver los pasos siguientes y la manera de construir la imagen.
+
+## Construir la imagen - Build
+
+Ya definimos la imagen, el directorio sobre el que vamos a trabajar, y los archivo iniciales de la imagen. Solo nos restan 2 pasos básicos:
+
+1. Ejecutar un comando para descargar las dependencias:
+
+   ```Dockerfile
+   RUN npm install
+   ```
+
+2. Definir el comando para levantar el proyecto:
+
+   ```Dockerfile
+   CMD [ "node", "src/app.js" ]
+   ```
+
+Para construir la imagen vamos a usar el siguiente comando (el `.` hace referencia al directorio actual, por lo tanto este comando se debe ejecutar en el lugar donde se tiene el dockerfile, de lo contrario se debe enviar la ruta absoluta):
+
+```txt
+$: docker build --tag cron-ticker .
+```
+
+Cuando se construye por primera vez la imagen puede ser un poco demorado, cuando se genera una nueva versión, solo validara las instrucciones qu hayan cambiado con la intención de generar nuevos layers, por ello es recomendable que siempre se definan en la parte superior los comandos que no se modifican a menudo ya que una vez detectado un cambio, los demás layers van a cambiar si o si.
+
+Una vez construida la imagen, podremos ejecutar un contenedor para usarla:
+
+```txt
+$: docker container run cron-ticker
+```
+
+Podemos consultar el peso de la imagen cuando la listamos:
+
+```txt
+$: docker image ls
+REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
+cron-ticker   latest    9819877b548f   2 minutes ago   173MB
+```
