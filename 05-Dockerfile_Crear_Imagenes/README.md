@@ -64,3 +64,27 @@ cron.schedule('1-59/5 * * * * *', () => {
     console.count('running a task')
 })
 ```
+
+## Dockerfile - primeros pasos
+
+Vamos a crear el archivo `Dockerfile` dentro del directorio del proyecto, con el fin de definir las instrucciones para crear una imagen de nuestro proyecto. Toda nuestra aplicación necesita empezar por un punto, por lo tanto vamos a usar la versión 19.2-alpine3.16 de NodeJS. El archivo se construirá de la siguiente manera:
+
+1. Dentro del archivo Dockerfile añadimos la instrucción `FROM` para definir la imagen:
+
+   ```Dockerfile
+   FROM node:19.2-alpine3.16
+   ```
+
+2. Definimos luego el directorio de trabajo en la carpeta `/app`:
+
+   ```Dockerfile
+   WORKDIR /app
+   ```
+
+3. Le damos la instrucción de cuales archivos se deben copiar, y el directorio en que debe guardarlos (cómo en el paso anterior definimos el directorio de trabajo, le vamos a indicar que se quede en el mismo):
+
+   ```Dockerfile
+   COPY app.js package.json ./
+   ```
+
+Las anteriores instrucciones son las más usadas dentro de las construcción de imágenes de proyectos. En la próxima lección vamos a ver los pasos siguientes y la manera de construir la imagen.
