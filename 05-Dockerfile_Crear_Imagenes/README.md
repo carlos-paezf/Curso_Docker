@@ -236,3 +236,41 @@ cron-ticker               latest    5553c2b0914a   25 hours ago   173MB
 
 $: docker push <username>/cron-ticker:blast
 ```
+
+## Consumir nuestra imagen de DockerHub
+
+Un apunte adicional a la lección anterior, es que siempre es recomendable por buena práctica subir de últimas la versión `latest` de la imagen, similar a cómo lo hacen las imágenes oficiales en Docker Hub:
+
+```txt
+$: docker image ls
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+cron-ticker   blast     5553c2b0914a   25 hours ago   173MB
+cron-ticker   latest    5553c2b0914a   25 hours ago   173MB
+
+$: docker tag cron-ticker <username>/cron-ticker
+
+$: docker tag cron-ticker:blast <username>/cron-ticker:blast
+
+$: docker image ls
+REPOSITORY                TAG       IMAGE ID       CREATED        SIZE
+<username>/cron-ticker    blast     5553c2b0914a   25 hours ago   173MB
+<username>/cron-ticker    latest    5553c2b0914a   25 hours ago   173MB
+cron-ticker               blast     5553c2b0914a   25 hours ago   173MB
+cron-ticker               latest    5553c2b0914a   25 hours ago   173MB
+
+$: docker push <username>/cron-ticker:blast
+
+$: docker push <username>/cron-ticker:latest
+```
+
+Ahora si vamos al punto central de esta imagen. Vamos a limpiar todas las imágenes que no están siendo usadas en nuestro equipo:
+
+```txt
+$: docker image prune -a
+```
+
+Haremos la prueba con una de las versiones subidas al repositorio de DockerHub. La primera acción que debe ejecutar el comando, es la descarga de la imagen ya que no la encuentra en local:
+
+```txt
+$: docker container run carlospaezf/cron-ticker:blast
+```
