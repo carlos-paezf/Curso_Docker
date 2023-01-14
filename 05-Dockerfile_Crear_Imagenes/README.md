@@ -197,3 +197,42 @@ cron-ticker   1.0.0     9819877b548f   32 minutes ago   173MB
 ```
 
 Para ejecutar una imagen en una versión especifica, construimos el contenedor definiendo la imagen como `cron-ticker:<version>`, sino se define se hará uso de la latest.
+
+## Subir imagen a Docker Hub
+
+En esta lección vamos a subir la imagen que creamos en Docker Hub. Para ello necesitamos tener una cuenta en dicha plataforma, y luego podemos pasar a una instancia de terminal para ejecutar el siguiente comando:
+
+```txt
+$: docker login
+```
+
+Regresamos a la plataforma de Docker Hub y creamos un nuevo repositorio, el cual nos dará un comando para subir la imagen con la siguiente estructura:
+
+```txt
+$: docker push <username>/<repositoryName>:<tagName>
+```
+
+Debemos crear un nuevo tag de nuestra imagen que tenga el mismo nombre del repositorio:
+
+```txt
+$: docker tag <image>:<tagName> <repositoryName>:<tagName>
+```
+
+Ahora subimos nuestra imagen:
+
+```txt
+$: docker image ls
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+cron-ticker   blast     5553c2b0914a   25 hours ago   173MB
+cron-ticker   latest    5553c2b0914a   25 hours ago   173MB
+
+$: docker tag cron-ticker:blast <username>/cron-ticker:blast
+
+$: docker image ls
+REPOSITORY                TAG       IMAGE ID       CREATED        SIZE
+<username>/cron-ticker    blast     5553c2b0914a   25 hours ago   173MB
+cron-ticker               blast     5553c2b0914a   25 hours ago   173MB
+cron-ticker               latest    5553c2b0914a   25 hours ago   173MB
+
+$: docker push <username>/cron-ticker:blast
+```
