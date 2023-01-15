@@ -332,3 +332,42 @@ Para ejecutar las pruebas debemos añadir el script dentro del `package.json`:
 ```
 
 Si ejecutamos los test, vamos a observar que falla y esto es intencional, ya que vamos a implementar la funcionalidad de que no se la imagen a menos que los test pases exitosamente.
+
+## Incorporar testing en la construcción
+
+Vamos a implementar el comando de pruebas dentro del archivo de Dockerfile, una vez que se haya copiado el archivo de `app.js`
+
+```Dockerfile
+...
+
+COPY app.js ./
+
+RUN npm run test
+
+CMD [ "node", "app.js" ]
+```
+
+Cuando tratamos de crear la imagen, se va a imprimir un error ya que bo reconoce los archivos de testing. Para solucionar este podemos escribir la siguiente instrucción (el inconveniente es que mapeará todo el directorio del proyecto incluyendo los módulos de node):
+
+```Dockerfile
+...
+COPY . .
+RUN npm run test
+```
+
+Si intentamos crear la imagen de nuevo, no podemos avanzar, por que los test no logran pasar, pero cuando corregimos el test por el de a continuación, la imagen avanza en su proceso:
+
+```js
+const { syncDB } = require("../../tasks/sync-db")
+
+
+describe('Pruebas en syncDB', () => {
+    test('Debe ejecutar el proceso 2 veces', () => {
+        syncDB()
+        const times = syncDB()
+        expect(times).toBe(2)
+    })
+})
+```
+
+El inconveniente ahora es que la imagen pesa demasiado.
