@@ -272,5 +272,63 @@ $: docker image prune -a
 Haremos la prueba con una de las versiones subidas al repositorio de DockerHub. La primera acción que debe ejecutar el comando, es la descarga de la imagen ya que no la encuentra en local:
 
 ```txt
-$: docker container run carlospaezf/cron-ticker:blast
+$: docker container run <username>/cron-ticker:blast
 ```
+
+## Añadir pruebas automáticas
+
+Las pruebas son una de las partes más importantes del desarrollo de un proyecto. Para la aplicación que estamos usando vamos a instalar `jest` con el siguiente comando:
+
+```txt
+$: pnpm i jest
+```
+
+Lo primero será organizar un poco el código creando la función que se ejecutará dentro del `cron.schedule`, y dicha función será guardada en el archivo `tasks/sync-db.js`:
+
+```js
+let ticks = 0
+
+const syncDB = () => {
+    console.count('running a task')
+    ticks++
+    return ticks
+}
+
+module.exports = { syncDB }
+```
+
+```js
+const cron = require('node-cron')
+const { syncDB } = require('../tasks/sync-db')
+
+cron.schedule('1-59/3 * * * * *', syncDB)
+```
+
+Lo siguiente es crear un archivo para realizar el o los test de la función. En este caso queremos comprobar que el método retorne el número 2:
+
+```js
+const { syncDB } = require("../tasks/sync-db")
+
+
+describe('Pruebas en syncDB', () => {
+    test('Debe ejecutar el proceso 2 veces', () => {
+        const times = syncDB()
+        expect(times).toBe(2)
+    })
+})
+```
+
+Para ejecutar las pruebas debemos añadir el script dentro del `package.json`:
+
+```json
+{
+    ...,
+    "scripts": {
+        "test": "jest",
+        ...
+    },
+    ...
+}
+```
+
+Si ejecutamos los test, vamos a observar que falla y esto es intencional, ya que vamos a implementar la funcionalidad de que no se la imagen a menos que los test pases exitosamente.
