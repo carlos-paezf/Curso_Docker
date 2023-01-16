@@ -371,3 +371,29 @@ describe('Pruebas en syncDB', () => {
 ```
 
 El inconveniente ahora es que la imagen pesa demasiado.
+
+## Examinar la imagen creada
+
+Lo primero será crear un contenedor con la última imagen que construimos:
+
+```txt
+$: docker container run -d <username>/cron-ticker:blast
+```
+
+Luego abrimos la ShellCommand del contenedor:
+
+```txt
+$: docker exec -it b55 /bin/sh 
+```
+
+> Es importante recordar que de ser necesario se debe ejecutar `export MSYS_NO_PATHCONV=1` cada que crea una instancia de GitBash.
+
+Cuando listamos los ficheros dentro del contenedor, nos encontraremos con lo siguiente:
+
+```txt
+/app # ls
+Dockerfile         node_modules       package.json       tasks
+app.js             package-lock.json  pnpm-lock.yaml     tests
+```
+
+Si listamos todos los paquetes de node, nos daremos cuenta que tenemos un gran problema por que hay muchos módulos que no necesitamos, además de que los archivos de testing no son necesarios dentro de la imagen, solo lo usamos para condicionar la construcción de la misma.
