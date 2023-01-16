@@ -10,4 +10,8 @@ COPY . .
 
 RUN npm run test
 
-CMD [ "node", "app.js" ]
+RUN rm -rf tests && rm -rf node_modules
+
+RUN npm install --prod
+
+CMD [ "npm", "start" ]

@@ -409,3 +409,20 @@ package-lock.json
 ```
 
 Si volvemos a construir la imagen, podremos observar que la imagen es un poco más pequeña. Cuando creamos un contenedor con dicha imagen y abrimos su ShellCommand, podremos listar los documentos que hay dentro del proyecto y notaremos que tanto el directorio `node_modules` y `package-lock.json` siguen en la imagen, y no hay que alarmarnos, esto se debe a la instrucción `npm install` que se redacto en el Dockerfile.
+
+## Remover archivos y carpetas de la imagen
+
+Una solución empírica para reducir el tamaño de la imagen, es ingresar a la terminal de un contenedor y eliminar los archivos y carpetas que no queremos. También podemos ir al Dockerfile y añadir una instrucción más:
+
+```Dockerfile
+...
+RUN npm run test
+
+RUN rm -rf tests && rm -rf node_modules
+
+RUN npm install --prod
+
+CMD [ "npm", "start" ]
+```
+
+Aunque ya no tiene la misma cantidad de archivos o directorios, la imagen pesa más que lo anterior, y esto se debe a que hay más layers en el Dockerfile
