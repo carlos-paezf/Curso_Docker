@@ -426,3 +426,14 @@ CMD [ "npm", "start" ]
 ```
 
 Aunque ya no tiene la misma cantidad de archivos o directorios, la imagen pesa más que lo anterior, y esto se debe a que hay más layers en el Dockerfile
+
+## Forzar una plataforma en la construcción
+
+Cuando necesitamos especificar una plataforma de manera forzada, cambiamos la instrucción de FROM, por ejemplo:
+
+```Dockerfile
+FROM --platform:arm64 node:19.2-alpine3.16
+...
+```
+
+Con el cambio de plataforma, toda la imagen se vuelve a construir, y si la publicamos podremos observar que se actualiza la arquitectura del sistema operativo.
