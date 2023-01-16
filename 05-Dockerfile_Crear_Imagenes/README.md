@@ -397,3 +397,15 @@ app.js             package-lock.json  pnpm-lock.yaml     tests
 ```
 
 Si listamos todos los paquetes de node, nos daremos cuenta que tenemos un gran problema por que hay muchos módulos que no necesitamos, además de que los archivos de testing no son necesarios dentro de la imagen, solo lo usamos para condicionar la construcción de la misma.
+
+## .dockerignore
+
+Es un archivo similar al .gitignore, en el cual se especifica todo lo que hay que ignorar en el proceso de construcción de la imagen. Por ejemplo, para ignorar algunos archivos escribimos lo siguiente
+
+```dockerignore
+node_modules/
+Dockerfile
+package-lock.json
+```
+
+Si volvemos a construir la imagen, podremos observar que la imagen es un poco más pequeña. Cuando creamos un contenedor con dicha imagen y abrimos su ShellCommand, podremos listar los documentos que hay dentro del proyecto y notaremos que tanto el directorio `node_modules` y `package-lock.json` siguen en la imagen, y no hay que alarmarnos, esto se debe a la instrucción `npm install` que se redacto en el Dockerfile.

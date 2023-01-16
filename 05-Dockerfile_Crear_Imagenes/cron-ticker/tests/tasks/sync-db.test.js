@@ -1,4 +1,4 @@
-const { syncDB } = require("../../tasks/sync-db")
+const { syncDB } = require("../../src/tasks/sync-db")
 
 
 describe('Pruebas en syncDB', () => {
