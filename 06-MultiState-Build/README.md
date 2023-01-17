@@ -96,3 +96,40 @@ $: docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7,linux/ris
 ## Docker Compose build - Preparación
 
 Para esta lección vamos a usar el [material adjunto](teslo-shop/), e instalamos las dependencias con el gestor de paquetes preferido (npm, yarn o pnpm), luego, clonamos el archivo `.env.template` y lo renombramos como `.env`. Para levantar la base de datos usamos el comando `docker-compose up -d`. Debemos ejecutar el siguiente comando para levantar la aplicación en modo desarrollo: `pnpm start:dev`. Para ejecutar el seed de datos vamos dentro de un navegador a la dirección `http://localhost:3000/api/seed`, y si ingresamos a `http://localhost:3000/api` veremos una documentación de los endpoints. Una vez comprobado que todo funciona, podemos detener el proyecto, y bajar el contenedor y red con `docker-compose down`.
+
+## Docker Compose - Target State
+
+Dentro del archivo `docker-compose.yml` vamos a añadir un nuevo servicio en el cual creamos un bind volume con el directorio raíz del proyecto, con la dirección `app/` del contenedor, también relacionamos las variables de entorno necesarias.
+
+```yaml
+...
+services:
+    app:
+        volumes:
+            - .:/app/
+        container_name: nest-app
+        ports:
+            - ${PORT}:${PORT}
+        environment:
+            APP_VERSION: ${APP_VERSION}
+            STAGE: ${STAGE}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_NAME: ${DB_NAME}
+            DB_HOST: ${DB_HOST}
+            DB_PORT: ${DB_PORT}
+            DB_USERNAME: ${DB_USERNAME}
+            PORT: ${PORT}
+            HOST_API: ${HOST_API}
+            JWT_SECRET: ${JWT_SECRET}
+    ...
+...
+```
+
+Si intentamos levantar el archivo con `docker-compose up`, nos vamos a encontrar el siguiente error:
+
+```txt
+$: docker compose up
+service "app" has neither an image nor a build context specified: invalid compose project
+```
+
+Lo anterior se debe a que se debe especificar una imagen para que se pueda levantar el proyecto.
