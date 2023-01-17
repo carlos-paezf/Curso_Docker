@@ -437,3 +437,68 @@ FROM --platform:arm64 node:19.2-alpine3.16
 ```
 
 Con el cambio de plataforma, toda la imagen se vuelve a construir, y si la publicamos podremos observar que se actualiza la arquitectura del sistema operativo.
+
+## [BuildX](https://docs.docker.com/build/building/multi-platform/#getting-started)
+
+Para saber cuales builders tenemos, ejecutamos el siguiente comando:
+
+```txt
+$: docker buildx ls
+NAME/NODE       DRIVER/ENDPOINT STATUS  BUILDKIT PLATFORMS
+default *       docker
+  default       default         running 20.10.21 linux/amd64, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
+desktop-linux   docker
+  desktop-linux desktop-linux   running 20.10.21 linux/amd64, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
+```
+
+Para crear un nuevo builder ejecutamos el siguiente comando:
+
+```txt
+$: docker buildx create --name mybuilder --driver docker-container --bootstrap
+```
+
+Una vez descargado el driver podemos usarlo con el siguiente comando:
+
+```txt
+$: docker buildx use mybuilder
+```
+
+Volvemos a listar los builders:
+
+```txt
+$: docker buildx ls
+NAME/NODE       DRIVER/ENDPOINT                STATUS  BUILDKIT PLATFORMS
+mybuilder *     docker-container
+  mybuilder0    npipe:////./pipe/docker_engine running v0.11.0  linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/mips64le, linux/mips64, linux/arm/v7, linux/arm/v6
+default         docker
+  default       default                        running 20.10.21 linux/amd64, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
+desktop-linux   docker
+  desktop-linux desktop-linux                  running 20.10.21 linux/amd64, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
+```
+
+Podemos inspeccionar el builder actual con el siguiente comando:
+
+```txt
+$: docker buildx inspect
+Name:   mybuilder
+Driver: docker-container
+
+Nodes:
+Name:      mybuilder0
+Endpoint:  npipe:////./pipe/docker_engine
+Status:    running
+Buildkit:  v0.11.0
+Platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/mips64le, linux/mips64, linux/arm/v7, linux/arm/v6
+```
+
+Ahora dentro de nuestro Dockerfile vamos a actualizar la sentencia FROM con lo siguiente:
+
+```Dockerfile
+FROM --platform=$BUILDPLATFORM node:19.2-alpine3.16
+```
+
+Y ahora podemos construir la imagen en diversas arquitecturas y subirla al repositorio de DockerHub:
+
+```txt
+$: docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t <username>/cron-ticker:ninja --push .
+```
