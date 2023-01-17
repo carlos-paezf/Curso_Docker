@@ -133,3 +133,64 @@ service "app" has neither an image nor a build context specified: invalid compos
 ```
 
 Lo anterior se debe a que se debe especificar una imagen para que se pueda levantar el proyecto.
+
+## Ejecutar partes específicas del Dockerfile
+
+Dentro del archivo `Dockerfile` necesitamos añadir una nueva etapa para ejecutar el proyecto en modo desarrollo:
+
+```Dockerfile
+FROM node:19-alpine3.15 as dev
+WORKDIR /app
+COPY package.json ./
+RUN yarn install
+CMD ["yarn", "start:dev"]
+```
+
+Luego, dentro del archivo `docker-compose.yml` definimos el contexto usado para construir la imagen, en este caso es la etapa que acabamos de añadir:
+
+```yaml
+...
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: dev
+        ...
+    ...
+...
+```
+
+Ahora si podemos usar el comando para levantar del docker-compose, mediante el cual se hace la construcción de la primera etapa del Dockerfile. El nuevo inconveniente es que no reconoce la conexión con la base de datos, para solucionar esto debemos ir al archivo `.env` y modificar el host de la base de datos:
+
+```.env
+DB_HOST=TesloDB
+```
+
+Luego hacemos una pequeña modificación al stage dedicado al desarrollo, en donde vamos a quitar el comando para delegarle dicha función al servicio en el docker-compose:
+
+```Dockerfile
+FROM node:19-alpine3.15 as dev
+WORKDIR /app
+COPY package.json ./
+RUN yarn install
+# CMD ["yarn", "start:dev"]
+```
+
+```yaml
+...
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: dev
+        command: yarn start:dev
+        ...
+    ...
+...
+```
+
+Por seguridad vamos a usar el comando `docker-compose down --volumes` para bajar el docker compose y los volumes creados por su proceso. Ejecutamos `docker-compose build` y `docker-compose up` y podremos observar que nuestro proyecto comienza a ejecutarse de manera correcta.
+
+Algunas personas prefieren tener dos archivos de Dockerfile separados, esto con el fin de dedicar stages solo para desarrollo y otros solo para producción.
