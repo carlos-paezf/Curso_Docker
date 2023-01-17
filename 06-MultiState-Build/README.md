@@ -78,3 +78,17 @@ $: docker container exec -it e9c /bin/sh
 ```
 
 Cuando subimos la imagen al repositorio en Docker Hub, observaremos que la imagen comprimida pesa aún menos, en este caso las anteriores imágenes estaban entre los 75 y 76 MB, pero esta última imagen pesa solo 54.6 MB
+
+## Build con otras arquitecturas
+
+Vamos a crear una imagen que este disponible para diversas arquitecturas, para lo cual podemos apoyarnos en la [lección de BuildX de la sección anterior](../05-Dockerfile_Crear_Imagenes/README.md#buildx). Lo primero será asignar la plataforma a las sentencias FROM, aunque este es un paso opcional para cuando tenemos variables de entorno:
+
+```Dockerfile
+FROM --platform=$BUILDPLATFORM node:19.2-alpine3.16 as <stage>
+```
+
+Y lo siguiente será crear la imagen con el siguiente comando (Para conocer las arquitecturas disponibles podemos inspeccionar el builder en uso con el comando `docker buildx inspect`. Con `--push` podemos enviar la imagen de manera directa al repositorio de Docker Hub):
+
+```txt
+$: docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7,linux/riscv64,linux/ppc64le,linux/s390x,linux/386,linux/mips64le -t <username>/cron-ticker:ninja --push .
+```
