@@ -92,3 +92,7 @@ Y lo siguiente será crear la imagen con el siguiente comando (Para conocer las 
 ```txt
 $: docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7,linux/riscv64,linux/ppc64le,linux/s390x,linux/386,linux/mips64le -t <username>/cron-ticker:ninja --push .
 ```
+
+## Docker Compose build - Preparación
+
+Para esta lección vamos a usar el [material adjunto](teslo-shop/), e instalamos las dependencias con el gestor de paquetes preferido (npm, yarn o pnpm), luego, clonamos el archivo `.env.template` y lo renombramos como `.env`. Para levantar la base de datos usamos el comando `docker-compose up -d`. Debemos ejecutar el siguiente comando para levantar la aplicación en modo desarrollo: `pnpm start:dev`. Para ejecutar el seed de datos vamos dentro de un navegador a la dirección `http://localhost:3000/api/seed`, y si ingresamos a `http://localhost:3000/api` veremos una documentación de los endpoints. Una vez comprobado que todo funciona, podemos detener el proyecto, y bajar el contenedor y red con `docker-compose down`.
