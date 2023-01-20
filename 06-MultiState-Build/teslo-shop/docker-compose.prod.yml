@@ -6,10 +6,8 @@ services:
             context: .
             dockerfile: Dockerfile
             target: ${STAGE}
-        command: yarn start:dev
-        volumes:
-            - .:/app/
-            - /app/node_modules
+        image: carlospaezf/teslo-shop-backend
+
         container_name: nest-app
         ports:
             - ${PORT}:${PORT}

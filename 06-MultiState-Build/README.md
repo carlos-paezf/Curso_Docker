@@ -222,3 +222,50 @@ Vamos a aplicar una pequeña configuración en el archivo de `tsconfig.json` con
 ```
 
 Para que reconozca el cambio anterior, es importante bajar el docker-compose y levantarlo de nuevo, de esta manera podremos realizar cambios en nuestro proyecto en equipo Host, y serán reconocidos en tiempo real por el contenedor.
+
+## Generar production build
+
+Vamos a bajar todo lo generado por el docker compose, y ahora vamos al archivo de `.env` y cambiamos el valor de la variable `STAGE` por `prod`, luego vamos al `docker-compose.yml` y definimos que el target de la construcción de la app sea la variable de entorno que acabamos de modificar:
+
+```yaml
+version: '3'
+
+services:
+    app:
+        build:
+            ...
+            target: ${STAGE}
+        ...
+    ...
+...
+```
+
+El problema que surge ahora es que no requerimos del bind volumes en una distribución de producción, y en un archivo de docker-compose no podemos hacer condicionales, por lo tanto, una solución que se puede plantear es crear un archivo `docker-compose.prod.yml` con el fin de determinar los procesos que se de deben ejecutar en producción, básicamente se pueden añadir o remover funcionalidades.
+
+Teniendo listo el nuevo archivo, podemos ejecutar los siguientes comandos:
+
+```txt
+$: docker-compose -f docker-compose.prod.yml build
+$: docker-compose -f docker-compose.prod.yml up
+```
+
+Cuando listamos las imágenes podemos observar que hay muchas sin nombre, lo cual vamos a intentar controlar mediante el propio archivo de docker-compose:
+
+```yaml
+...
+services:
+    app:
+        ...
+        image: <username>/teslo-shop-backend
+        ...
+    ...
+...
+```
+
+También podemos especificar que solo se construya un servicio en particular con el siguiente comando:
+
+```txt
+$: docker-compose -f docker-compose.prod.yml build app
+```
+
+> Esto es un caso especial para el proyecto de NestJS, dentro del archivo `app.module.ts` vamos a eliminar la configuración de `ssl` y `extra`.
