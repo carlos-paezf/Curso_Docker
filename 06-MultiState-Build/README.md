@@ -194,3 +194,31 @@ services:
 Por seguridad vamos a usar el comando `docker-compose down --volumes` para bajar el docker compose y los volumes creados por su proceso. Ejecutamos `docker-compose build` y `docker-compose up` y podremos observar que nuestro proyecto comienza a ejecutarse de manera correcta.
 
 Algunas personas prefieren tener dos archivos de Dockerfile separados, esto con el fin de dedicar stages solo para desarrollo y otros solo para producción.
+
+## Probar el BindVolume desde el compose
+
+Ya que tenemos los servicios de la base de datos y la aplicación en un mismo docker-compose, levantamos ambos con solamente el comando de `docker-compose up`, no lo levantamos en detach por qué queremos observar la interacción del proyecto en consola.
+
+Vamos a aplicar una pequeña configuración en el archivo de `tsconfig.json` con la intención de que funcione el BindVolume en Windows:
+
+```json
+{
+    ...,
+    "watchOptions": {
+        // Use native file system events for files and directories
+        "watchFile": "priorityPollingInterval",
+        "watchDirectory": "dynamicprioritypolling",
+        // Poll files for updates more frequently when they're updated a lot
+        "fallbackPolling": "dynamicPriority",
+        // Don´t coalesce watch notification
+        "synchronousWatchDirectory": true,
+        // Finally, two additional settings for reducing the amount of possible files to track work from these directories
+        "excludeDirectories": [
+            "**/node_modules",
+            "dist"
+        ]
+    }
+}
+```
+
+Para que reconozca el cambio anterior, es importante bajar el docker-compose y levantarlo de nuevo, de esta manera podremos realizar cambios en nuestro proyecto en equipo Host, y serán reconocidos en tiempo real por el contenedor.
