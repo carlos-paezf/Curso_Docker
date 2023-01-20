@@ -27,3 +27,4 @@ Algunas de las instalaciones recomendadas para el curso son las siguientes: [(Do
 - [Sección 04: Multi-container - Apps - Docker Compose](04-Multicontainer_Apps_Docker_Compose/README.md)
 - [Sección 05: Dockerfile - Crear Imágenes](05-Dockerfile_Crear_Imagenes/README.md)
 - [Sección 06: Multi-State Build](06-MultiState-Build/README.md)
+- [Sección 07: Deployments y Registros](07-Deployments-Registros/README.md)
