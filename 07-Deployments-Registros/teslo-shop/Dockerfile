@@ -1,31 +1,31 @@
-FROM node:19-alpine3.15 as dev
+FROM --platform=$BUILDPLATFORM node:19-alpine3.15 as dev
 WORKDIR /app
 COPY package.json ./
-RUN npm install --legacy-peer-deps
-CMD [ "npm", "run", "start:dev" ]
+RUN yarn install
+CMD [ "yarn", "start:dev" ]
 
 
 
-FROM node:19-alpine3.15 as dev-deps
+FROM --platform=$BUILDPLATFORM node:19-alpine3.15 as dev-deps
 WORKDIR /app
 COPY package.json package.json
-RUN npm install --frozen-lockfile --legacy-peer-deps
+RUN yarn install --frozen-lockfile
 
 
-FROM node:19-alpine3.15 as builder
+FROM --platform=$BUILDPLATFORM node:19-alpine3.15 as builder
 WORKDIR /app
 COPY --from=dev-deps /app/node_modules ./node_modules
 COPY . .
-# RUN npm test
-RUN npm run build
+# RUN yarn test
+RUN yarn build
 
-FROM node:19-alpine3.15 as prod-deps
+FROM --platform=$BUILDPLATFORM node:19-alpine3.15 as prod-deps
 WORKDIR /app
 COPY package.json package.json
-RUN npm install --omit=dev --frozen-lockfile --legacy-peer-deps
+RUN yarn install --omit=dev --frozen-lockfile
 
 
-FROM node:19-alpine3.15 as prod
+FROM --platform=$BUILDPLATFORM node:19-alpine3.15 as prod
 EXPOSE 3000
 WORKDIR /app
 ENV APP_VERSION=${APP_VERSION}
