@@ -73,3 +73,31 @@ Una de las configuraciones importantes, es la restricción de la conectividad a 
 Los pasos anteriores se realizan mientras se crea el cluster, en la siguiente lección vamos a probar la base de datos una vez creada.
 
 > Advertencia: Siempre es importante bajar los servicios cada que no los estemos usando, con el fin de evitar cobros a la tarjeta, por ejecución de los mismos.
+
+## Probar la Base de Datos
+
+Vamos a probar la base de datos Postgres que conectaremos a nuestra API. Lo primero será ingresar a la sección de Databases dentro del proyecto en Digital Ocean, luego seleccionamos el cluster creado, pasamos a la sección de usuarios y creamos uno nuevo, por defecto se genera una contraseña para el nuevo usuario. Dentro de la sección de bases de datos, añadimos una con el objetivo de conectarla a nuestro proyecto.
+
+Volvemos a la pestaña de Overview dentro del cluster, y en los detalles de conexión, seleccionamos al nuevo usuario y tendremos los datos con los cuales nos podemos conectar. Es importante resaltar que la conexión con el cluster requiere la configuración SSL (certificado de Secure Sockets Layer), por lo que debemos volver a activar dicha configuración dentro del archivo `app.module.ts` de nuestra aplicación.
+
+```ts
+@Module( {
+    imports: [
+        ConfigModule.forRoot(),
+
+        TypeOrmModule.forRoot( {
+          ssl: process.env.STAGE === 'prod',
+          extra: {
+                ssl: process.env.STAGE === 'prod'
+                    ? { rejectUnauthorized: false }
+                    : null,
+            },
+            ...
+        })
+        ...
+    ],
+} )
+export class AppModule { }
+```
+
+También es bueno intentar que nos conectemos a la base de datos desde una aplicación de terceros, como por ejemplo TablePlus.
