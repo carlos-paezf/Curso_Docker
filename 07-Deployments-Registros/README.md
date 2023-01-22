@@ -61,3 +61,15 @@ Con lo anterior listo, pasamos a probar usando el comando de:
 ```txt
 $: docker-compose up
 ```
+
+## Digital Ocean - Aprovisionamiento de Base de Datos
+
+> Al día de hoy, Digital Ocean no cuenta con la promoción de $200 créditos, por lo tanto no se realizó el despliegue de la base de datos en dicha plataforma, pero se puede hacer uso de Railway, con la cual se puede usar $5 o 500 horas de ejecución al mes de manera gratuita.
+
+En Digital Ocean creamos un nuevo proyecto desde el dashboard, al cual le indicamos que el proyecto tiene como propósito un proyecto de clase o con propósitos educativos. A continuación vamos a la sección de Databases y creamos un nuevo cluster de base de datos. Por defecto dejamos la región que aparece, seleccionamos la maquina de base de datos, seleccionamos el plan económico, asignamos el nombre del cluster, seleccionamos el proyecto, asignamos los tags de manera opcional y finalizamos la creación del cluster.
+
+Una de las configuraciones importantes, es la restricción de la conectividad a IPs no deseadas, por el momento continuamos sin seguridad. El paso siguiente es obtener los datos de conexión al cluster, mediante una red pública.
+
+Los pasos anteriores se realizan mientras se crea el cluster, en la siguiente lección vamos a probar la base de datos una vez creada.
+
+> Advertencia: Siempre es importante bajar los servicios cada que no los estemos usando, con el fin de evitar cobros a la tarjeta, por ejecución de los mismos.
