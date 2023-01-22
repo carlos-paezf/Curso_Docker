@@ -148,3 +148,9 @@ Podemos desplegar la imagen de nuestro proyecto desde Docker Hub hacía Digital 
 Para el despliegue de la imagen desde Docker Hub a Digital Ocean, los repositorios deben ser públicos, pero si queremos que la imagen sea privada, lo que haremos es usar la sección de Container Registry con el objetivo de manejar un repo privado.
 
 Una vez creado el contenedor de registro, vamos a usar el API Token, por lo que creamos una clave secreta para el ingreso. Luego usamos el comando de `docker login registry.digitalocean.com` con las credenciales de nombre de usuario y password siendo reemplazadas por el API Token. Las demás configuraciones son por defecto, o personalizadas de acuerdo a nuestras necesidades.
+
+## Subir imagen al registro
+
+Digital Ocean nos pide que una vez autenticados, usemos el comando `docker tag <my-image> registry.digitalocean.con/<my-register>/<my-image>` con el fin de renombrar la imagen que vamos a subir, luego la cargamos con `docker push registry.digitalocean.com/<my-registry>/<my-image>`.
+
+También podemos usar BuildX con el fin de cargar la imagen en diversas arquitecturas, lo único que se debe tener en cuenta es que se debe seguir el patron de `egistry.digitalocean.com/<my-registry>/<my-image>` en el nombre de la imagen.
