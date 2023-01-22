@@ -138,3 +138,7 @@ Otra configuración a tener en cuenta, es la actualización de la imagen con el 
 Cómo ya actualizamos la imagen, y la enviamos al repositorio de Docker Hub, lo usaremos dentro del servicio app del docker-compose, y luego podemos usar el endpoint `http://localhost:3000/api/seed` para poblar la base de datos.
 
 Si observamos la base de datos en la plataforma Digital Ocean o Railways, podremos observar que la base de datos ha sido poblada correctamente.
+
+## Desplegar la imagen directamente desde Docker Hub
+
+Podemos desplegar la imagen de nuestro proyecto desde Docker Hub hacía Digital Ocean, para lo cual vamos al Dashboard de nuestro proyecto en Digital Ocean, y en la opción de Apps creamos una nueva app y seleccionamos el provisionador del servicio, en este caso Docker Hub, el cual funciona solo con proyectos públicos, adjuntamos el enlace del repositorio y de manera opcional podemos definir el tag de la imagen. Lo siguiente es configurar las variables de entorno globales de la imagen, en este caso son las que definimos dentro de nuestro archivo `.env`. Seguido a ello podemos añadir algunas configuraciones extra como las configuraciones de los costos entre otros.
