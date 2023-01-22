@@ -142,3 +142,9 @@ Si observamos la base de datos en la plataforma Digital Ocean o Railways, podrem
 ## Desplegar la imagen directamente desde Docker Hub
 
 Podemos desplegar la imagen de nuestro proyecto desde Docker Hub hacía Digital Ocean, para lo cual vamos al Dashboard de nuestro proyecto en Digital Ocean, y en la opción de Apps creamos una nueva app y seleccionamos el provisionador del servicio, en este caso Docker Hub, el cual funciona solo con proyectos públicos, adjuntamos el enlace del repositorio y de manera opcional podemos definir el tag de la imagen. Lo siguiente es configurar las variables de entorno globales de la imagen, en este caso son las que definimos dentro de nuestro archivo `.env`. Seguido a ello podemos añadir algunas configuraciones extra como las configuraciones de los costos entre otros.
+
+## Crear registro y desplegar imagen en él
+
+Para el despliegue de la imagen desde Docker Hub a Digital Ocean, los repositorios deben ser públicos, pero si queremos que la imagen sea privada, lo que haremos es usar la sección de Container Registry con el objetivo de manejar un repo privado.
+
+Una vez creado el contenedor de registro, vamos a usar el API Token, por lo que creamos una clave secreta para el ingreso. Luego usamos el comando de `docker login registry.digitalocean.com` con las credenciales de nombre de usuario y password siendo reemplazadas por el API Token. Las demás configuraciones son por defecto, o personalizadas de acuerdo a nuestras necesidades.
