@@ -28,3 +28,4 @@ Algunas de las instalaciones recomendadas para el curso son las siguientes: [(Do
 - [Sección 05: Dockerfile - Crear Imágenes](05-Dockerfile_Crear_Imagenes/README.md)
 - [Sección 06: Multi-State Build](06-MultiState-Build/README.md)
 - [Sección 07: Deployments y Registros](07-Deployments-Registros/README.md)
+- [Sección 08: Construcciones automáticas - Github Actions](08-Construcciones_automaticas_Github_Actions/README.md)
