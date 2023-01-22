@@ -101,3 +101,34 @@ export class AppModule { }
 ```
 
 También es bueno intentar que nos conectemos a la base de datos desde una aplicación de terceros, como por ejemplo TablePlus.
+
+## Conectar contenedor con la base de datos
+
+Para conectar nuestra base de datos al contenedor de la API, requerimos hacer algunas actualizaciones dentro del archivo `.env`, por ejemplo, la variable `STAGE=testing`, pasará a ser `STAGE=prod`, esto con la intención de que la configuración de la lección pasada sea reconocida. Las demás variables se deben actualizar con los datos de conexión al cluster y base de datos en Digital Ocean (o en Railway como es mi caso).
+
+Con lo anterior actualizado, debemos modificar el archivo de docker-compose, ya que no necesitamos el servicio de la base de datos:
+
+```yaml
+version: '3'
+
+services:
+    app:
+        image: carlospaezf/teslo-shop:1.0.1
+        restart: always
+        container_name: teslo-backend
+        ports:
+            - ${PORT}:${PORT}
+        environment:
+            APP_VERSION: ${APP_VERSION}
+            STAGE: ${STAGE}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_NAME: ${DB_NAME}
+            DB_HOST: ${DB_HOST}
+            DB_PORT: ${DB_PORT}
+            DB_USERNAME: ${DB_USERNAME}
+            PORT: ${PORT}
+            HOST_API: ${HOST_API}
+            JWT_SECRET: ${JWT_SECRET}
+```
+
+Otra configuración a tener en cuenta, es la actualización de la imagen con el nuevo cambio mencionado en la lección anterior dentro de Docker Hub, por lo que volvemos a ejecutar el comando de construcción de la imagen, especialmente el que nos ayuda en la definición de la imagen para múltiples arquitecturas. (Recomendable que le subamos un número a la versión de acuerdo al standard de control de versiones semántico)
