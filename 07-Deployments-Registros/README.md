@@ -113,7 +113,7 @@ version: '3'
 
 services:
     app:
-        image: carlospaezf/teslo-shop:1.0.1
+        image: <username>/teslo-shop:1.0.1
         restart: always
         container_name: teslo-backend
         ports:
@@ -132,3 +132,9 @@ services:
 ```
 
 Otra configuración a tener en cuenta, es la actualización de la imagen con el nuevo cambio mencionado en la lección anterior dentro de Docker Hub, por lo que volvemos a ejecutar el comando de construcción de la imagen, especialmente el que nos ayuda en la definición de la imagen para múltiples arquitecturas. (Recomendable que le subamos un número a la versión de acuerdo al standard de control de versiones semántico)
+
+## Prueba local de la nueva imagen
+
+Cómo ya actualizamos la imagen, y la enviamos al repositorio de Docker Hub, lo usaremos dentro del servicio app del docker-compose, y luego podemos usar el endpoint `http://localhost:3000/api/seed` para poblar la base de datos.
+
+Si observamos la base de datos en la plataforma Digital Ocean o Railways, podremos observar que la base de datos ha sido poblada correctamente.
