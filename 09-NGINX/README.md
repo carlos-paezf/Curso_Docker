@@ -44,3 +44,50 @@ Luego, dentro de la consola interactiva podemos revisar un directorio que contie
 ```txt
 $: cd usr/share/nginx/html
 ```
+
+## Construir la imagen de nuestra aplicación
+
+Para construir nuestra imagen debemos contar con la carpeta `dist`, luego creamos el archivo `.dockerignore` en el cual añadimos los siguientes directorios y archivos:
+
+```.dockerignore
+node_modules/
+.git
+dist
+```
+
+Luego, creamos el archivo `Dockerfile` en el que tendremos la siguiente configuración:
+
+```Dockerfile
+FROM node:19-alpine3.15 as dev-deps
+WORKDIR /app
+COPY package.json package.json
+RUN yarn install --frozen-lockfile
+
+
+FROM node:19-alpine3.15 as builder
+WORKDIR /app
+COPY --from=dev-deps /app/node_modules ./node_modules
+COPY . .
+RUN yarn test
+RUN yarn build
+
+
+FROM nginx:1.23.3 as prod
+EXPOSE 80
+COPY --from=builder /app/dist /usr/share/nginx/html
+CMD [ "nginx", "-g", "daemon off;" ]
+```
+
+Cuando levantamos la imagen, con el comando a continuación, vamos a observar que se van ejecutando las diversas fases y etapas internas.
+
+```txt
+$: docker build -t <username>/react-nginx:1.0.0 . --no-cache
+```
+
+Lo siguiente será levantar un contenedor con la imagen:
+
+```txt
+$: docker run --name heroes-react-nginx -dp 80:80 <username>/react-nginx:1.0.0
+```
+
+Cuando ingresamos a `localhost`, observamos la aplicación, pero las imágenes no se podrán ver, la configuración para que aparezcan lo veremos en una próxima lección. Otro "problema", es que las rutas cuando se recarga la aplicación, se rompen, y eso se debe a la incompatibilidad entre el router propio de react, con el router de nginx.
