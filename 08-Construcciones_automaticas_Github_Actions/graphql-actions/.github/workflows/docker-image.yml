@@ -29,3 +29,8 @@ jobs:
 
             - name: Push Docker Image
               run: docker push $DOCKER_REPOSITORY:1.0.0
+
+            - name: Build and Push Docker Image Latest
+              run: |
+                  docker build -t $DOCKER_REPOSITORY:latest . 
+                  docker push $DOCKER_REPOSITORY:latest

@@ -153,3 +153,20 @@ jobs:
 ```
 
 Una vez enviado los cambios, y terminada la ejecución del nuevo workflow (el cual lleva el mismo nombre del commit con el que se envía), podemos ir a nuestro repositorio de Docker Hub y revisar que la nueva imagen se haya publicado. Recordemos que podemos hacer la prueba de que está bien, si creamos un contenedor con la imagen, en este caso es importante que estemos logeados ya que el repositorio de docker está privado.
+
+## Renombrar Latest
+
+Siempre es importante que por buenas practicas, tengamos una versión latest de nuestra imagen, aparte de una versión nombrada. En este caso, vamos a añadir un nuevo step que se encargue de crear y enviar esa última versión:
+
+```yaml
+...
+jobs:
+    build:
+        ...
+        steps:
+            ...
+            - name: Build and Push Docker Image Latest
+              run: |
+                  docker build -t $DOCKER_REPOSITORY:latest . 
+                  docker push $DOCKER_REPOSITORY:latest
+```
