@@ -104,3 +104,52 @@ jobs:
 ```
 
 En estos momentos hacemos un commit con los cambios, y podemos observar dentro de la pestaña de Actions en el repositorio de GitHub, que se crea un nuevo workflow y tenemos la oportunidad de observar los logs de cada paso en el trabajo de `Build`.
+
+## Step - Construir imagen
+
+Podemos escribir todos los comandos en un solo paso, pero es mejor separarlo por pasos, por lo tanto, añadimos un nuevo step que se encargue de construir la imagen y otro para hacer el envío de la misma:
+
+```yaml
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            ...
+
+            - name: Build Docker Image
+              run: docker build -t <username>/docker-github-actions:1.0.0 .
+
+            - name: Push Docker Image
+              run: docker push <username>/docker-github-actions:1.0.0
+```
+
+Podemos ver oportunidades de mejora del código al crear variables de entorno con un scope global, de esta manera podemos reutilizarlas en los lugares que lo necesitemos, similar al siguiente código:
+
+```yaml
+...
+env:
+    DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+    DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    DOCKER_REPOSITORY: ${{ secrets.DOCKER_USERNAME }}/docker-github-actions
+
+jobs:
+    build:
+        ...
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - name: Docker Login
+              run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+            - name: Build Docker Image
+              run: docker build -t $DOCKER_REPOSITORY:1.0.0 .
+
+            - name: Push Docker Image
+              run: docker push $DOCKER_REPOSITORY:1.0.0
+```
+
+Una vez enviado los cambios, y terminada la ejecución del nuevo workflow (el cual lleva el mismo nombre del commit con el que se envía), podemos ir a nuestro repositorio de Docker Hub y revisar que la nueva imagen se haya publicado. Recordemos que podemos hacer la prueba de que está bien, si creamos un contenedor con la imagen, en este caso es importante que estemos logeados ya que el repositorio de docker está privado.

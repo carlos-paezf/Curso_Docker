@@ -6,6 +6,11 @@ on:
     pull_request:
         branches: ["main"]
 
+env:
+    DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+    DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    DOCKER_REPOSITORY: ${{ secrets.DOCKER_USERNAME }}/docker-github-actions
+
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -17,7 +22,10 @@ jobs:
                   fetch-depth: 0
 
             - name: Docker Login
-              env:
-                  DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
-                  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-              run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+              run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+            - name: Build Docker Image
+              run: docker build -t $DOCKER_REPOSITORY:1.0.0 .
+
+            - name: Push Docker Image
+              run: docker push $DOCKER_REPOSITORY:1.0.0
