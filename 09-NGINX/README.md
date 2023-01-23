@@ -30,3 +30,17 @@ $: docker run --name nginx -dp 8080:80 nginx:1.23.3
 ```
 
 Si abrimos la dirección `localhost:8080` podemos observar la bienvenida por parte de Nginx.
+
+## Inspeccionar Nginx
+
+Con el contenedor de la lección anterior, vamos realizar un inspect del mismo, por lo que usamos el comando:
+
+```txt
+$: docker exec -it <id> bash
+```
+
+Luego, dentro de la consola interactiva podemos revisar un directorio que contiene algunos archivo html con el siguiente comando:
+
+```txt
+$: cd usr/share/nginx/html
+```
