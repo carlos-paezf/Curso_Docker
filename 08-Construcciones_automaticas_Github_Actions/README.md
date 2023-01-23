@@ -170,3 +170,28 @@ jobs:
                   docker build -t $DOCKER_REPOSITORY:latest . 
                   docker push $DOCKER_REPOSITORY:latest
 ```
+
+## Versionamiento semántico automático
+
+Existen acciones personalizadas por otras personas, que nosotros podemos usar dentro de nuestro archivos de GitHub Actions, este es el caso de [Git Semantic Versión](https://github.com/marketplace/actions/git-semantic-version?version=v4.0.3). Para esta acción personalizada usamos el comando `uses` dentro del step que crearemos. Otros elementos importantes son la definición de los patrones que debe reconocer en los nombres de los commits, con el fin de que aumente la versión, ya sea por un cambio de tipo `major` o un `minor` (a la cual llamaremos `feat`), de manera automática cada commit son patron será reconocido como un prerelease, por ejemplo si enviamos un commit con el nombre `major: Cambio general de la API` la versión pasara de `0.0.0-prerelease0` a `1.0.0-prerelease0`; si el commit tiene el nombre `feat: Nueva característica añadida` la versión pasará de `1.0.0-prerelease0` a `1.1.0-prerelease0`; si dejamos un commit sin nombre, entonces la versión pasará de `1.1.0-prerelease0` a `1.1.0-prerelease1`. También es importante que creemos un id para el step con el fin de usar sus outputs, como es el caso de la versión:
+
+```yaml
+...
+jobs:
+    build:
+        ...
+        steps:
+            ...
+            - name: Git Semantic Version
+              uses: PaulHatch/semantic-version@v4.0.3
+              with:
+                  major_pattern: "MAJOR:"
+                  minor_pattern: "FEAT:"
+                  format: "${major}.${minor}.${patch}-prerelease${increment}"
+              id: version
+            ...
+            - name: Build Docker Image
+              env:
+                  NEW_VERSION: ${{ steps.version.outputs.version }}
+              run: docker build -t $DOCKER_REPOSITORY:$NEW_VERSION .
+```
