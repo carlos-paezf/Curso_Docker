@@ -91,3 +91,92 @@ $: docker run --name heroes-react-nginx -dp 80:80 <username>/react-nginx:1.0.0
 ```
 
 Cuando ingresamos a `localhost`, observamos la aplicación, pero las imágenes no se podrán ver, la configuración para que aparezcan lo veremos en una próxima lección. Otro "problema", es que las rutas cuando se recarga la aplicación, se rompen, y eso se debe a la incompatibilidad entre el router propio de react, con el router de nginx.
+
+## nginx config
+
+Como la aplicación es un SPA, las urls están siendo gestionadas por la misma aplicación, por lo que debemos empatarla con NGINX, para ello vamos a abrir una terminal interactiva del contenedor y dirigirnos a un path en especifico:
+
+```txt
+$: docker exec -it <id> bash
+
+root@<id>:/# cd etc/nginx/conf.d
+
+root@<id>:/# cat default.conf
+```
+
+El contenido de dicho archivo lo copiamos y luego lo pegamos en nuestro proyecto local en el archivo `nginx/nginx.conf`:
+
+```conf
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name  localhost;
+
+    #access_log  /var/log/nginx/host.access.log  main;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
+```
+
+Luego vamos a aplicar una configuración dentro de la sección de location, con la intención de indicarle que no importa la ruta, sea gestionada por el archivo `index.html`, el cual es el archivo que copiamos en el step `prod` dentro del Dockerfile:
+
+```conf
+server {
+    ...
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+        try_files $uri $uri/ /index.html;
+    }
+    ...
+}
+```
+
+Lo que estamos haciendo sería muy tedioso si lo tuviéramos que hacer cada creamos una imagen de nuestro proyecto, por lo tanto dentro del mismo archivo Dockerfile, nos vamos a encargar de enviarle por defecto la nueva configuración con el archivo que creamos en nuestro local:
+
+```Dockerfile
+...
+FROM nginx:1.23.3 as prod
+EXPOSE 80
+COPY --from=builder /app/dist /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d
+CMD [ "nginx", "-g", "daemon off;" ]
+```
+
+Cuando levantamos la nueva imagen, y creamos un contenedor con la misma, podremos observar que las rutas ya no generan problema, y sin importar en donde estemos o que parámetros usemos, si recargamos la página, todo se mantendrá estable. El único inconveniente es que seguimos sin ver las imágenes.
