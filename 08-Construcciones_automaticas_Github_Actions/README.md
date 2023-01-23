@@ -66,3 +66,41 @@ $: docker container run \
     -dp 3000:3000 \
     <username>/docker-github-actions:0.0.1
 ```
+
+## GitHub Actions - Steps
+
+Los Steps de GitHub Actions son pasos similares a lo que hacemos en la construcción de una imagen. En nuestro repositorio se creo de manera automática el archivo con algunos pasos básicos, podemos hacer la edición del mismo desde GitHub, o podemos hacer un pull al repositorio local y modificarlo desde nuestro equipo, claro que luego debemos hacer un push para que el repo en la nube se actualice.
+
+Vamos a crear un paso que realice un checkout de nuestro código:
+
+```yaml
+...
+jobs:
+    build:
+        ...
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+```
+
+La segunda acción será el login en Docker, para la cual definimos como variables de entorno, las secrets que creamos en lecciones pasadas, y mediante la propiedad `run`, definimos el o los comandos que se deben usar (Cuando tenemos varios comandos que se deben ejecutar de manera independiente usamos el símbolo `|` luego de la definición de `run`, en caso de que sea solo un comando, podemos escribirlo inline).
+
+```yaml
+jobs:
+    build:
+        ...
+        steps:
+            ...
+            - name: Docker Login
+              env:
+                  DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+                  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+              run: |
+                  echo "Login in Docker - Start"
+                  docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+                  echo "Login in Docker - End"
+```
+
+En estos momentos hacemos un commit con los cambios, y podemos observar dentro de la pestaña de Actions en el repositorio de GitHub, que se crea un nuevo workflow y tenemos la oportunidad de observar los logs de cada paso en el trabajo de `Build`.
