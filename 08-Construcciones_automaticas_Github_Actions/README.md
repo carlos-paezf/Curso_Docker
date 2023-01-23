@@ -26,3 +26,43 @@ Dentro del directorio del proyecto ejecutamos `git init`, `git add .`, `git comm
 Dentro del repositorio en GitHub vamos a la sección de Settings, luego a Security, Secrets and variables, y luego vamos a Actions. Lo que vamos a guardar como secrets son el nombre de usuario u organización en DockerHub, por lo tanto pulsamos el botón de New repository secret, asignamos el nombre de `DOCKER_USERNAME`, y como secret añadimos el nombre de usuario. El siguiente secret será la contraseña, repetimos el mismo proceso, en este caso vamos a usar el nombre `DOCKER_PASSWORD`, pero en vez de usar nuestra contraseña, vamos a Docker Hub y en la sección de Security creamos un Access Token (los token solo se muestran una vez, por lo tanto es importante tenerlos guardados en lugares seguros).
 
 Terminadas la configuración de las 2 variables, creamos un repositorio dentro de DockerHub al cual subiremos la imagen. Recordar que el acceso gratuito solo permite 1 repositorio privado, el cual viene bien para este proyecto.
+
+## Primeros pasos de GitHub Actions
+
+Dentro de las sección de Actions en nuestro repositorio de GitHub, buscamos `Docker image` y pasamos a configurarlo. Por defecto nos va a crear un archivo en `<repo>/.github/workflows/docker-image.yml`. La sección `on` configura los triggers mediante los cuales se reconoce que debe trabajar las a actions, los `jobs` son las actividades que debe ejecutar:
+
+```yaml
+name: Docker Image CI
+
+on:
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
+
+jobs:
+
+    build:
+
+        runs-on: ubuntu-latest
+
+        steps:
+        - uses: actions/checkout@v3
+        - name: Build the Docker image
+            run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+```
+
+Una sugerencia es que probemos que funciona la construcción de la imagen del proyecto, pero en este caso usaremos la construcción tradicional:
+
+```txt
+$: docker build -t <username>/docker-github-actions:0.0.1 .
+```
+
+Luego levantamos un contenedor con la imagen:
+
+```txt
+$: docker container run \
+    --name github-actions \
+    -dp 3000:3000 \
+    <username>/docker-github-actions:0.0.1
+```
