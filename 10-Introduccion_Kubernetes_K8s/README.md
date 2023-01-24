@@ -13,3 +13,30 @@ Esta sección pretende darles una idea de cómo funciona Kubernetes (K8s) y vari
 - Replicas
 - Kubernetes Docs
 - Cleaning.
+
+## Introducción a Kubernetes
+
+Kubernetes es una plataforma para automatizar el despliegue, escala y manejo de contenedores, creado originalmente por Google, pero actualmente es de código libre.
+
+Kubernetes resuelve problemas como:
+
+- Los usuarios esperan un servicio 24/7
+- Los de IT esperan hacer muchos despliegues en un día sin detener el servicio que está corriendo.
+- Las compañías esperan mayor eficiencia de los recursos en la nube.
+- Un sistema tolerante a fallas en el momento que algo salga mal
+- Escalar hacia arriba o abajo según demanda.
+
+Hay un termino conocido como ***Orquestación***, el cual hace manejo automático de aplicaciones en contenedores, nos ayuda a tener una alta disponibilidad, prácticamente no hay "downtimes" en reemplazos de versiones, y un fácil manejo de réplicas.
+
+Kubernetes tiene 8 componentes principales:
+
+1. ***Pod***, los cuales son los objetos implementables más pequeños en K8s, es una capa abstracta sobre uno o más contenedores, esto permite reemplazarlos fácilmente. Tienen una IP única asignada, que al reconstruirse cambia. En resumen, es una capa que se construye sobre los contenedores.
+2. ***Service***, tienen una IP única asignada que resuelven la conexión y comunicación entre Pods. Existen los Internal Service y los External Service. Las IP es permanente y el ciclo de vida del POD y el Servicio son independientes. En resumen, permite la comunicación con direcciones fijas.
+3. ***Ingress***, reciben las solicitudes que llegan a los puertos expuestos y que deben ser enviados a los servicios. Se puede decir que, trabaja con el tráfico externo que viaja hacía adentro del cluster.
+4. ***ConfigMap***, podemos verlo como las variables de entorno que no son privadas, por ejemplo la URL de la base de datos.
+5. ***Secret***, son parecidos al anterior pero con seguros. K8s no encripta, por lo que los valores que se almacenen ya deben estar ofuscadas
+6. ***Volume***, son el almacenamiento en una máquina local, o lugar remoto fuera de cluster de K8s, el cual no maneja la persistencia de la data.
+7. ***Deployment***, es el plano o "Blueprint" para crear todo POD y la cantidad de replicas. Aquí es donde se puede escalar hacia arriba o hacia abajo la cantidad de replicas.
+8. ***StatefulSet***, es el plano similar a los deployments, pero para bases de datos principalmente, no podemos replicar las bases de datos.
+
+Los ***Clusters*** son un grupo de nodos que corren aplicaciones en contenedores de una forma eficiente, automatizada, distribuida y escalable.
