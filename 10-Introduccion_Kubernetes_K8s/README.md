@@ -365,7 +365,7 @@ spec:
                         name: pg-admin-secrets
                         key: PG_USER_EMAIL
               - name: PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION
-                value: "false"
+                value: "False"
 
 ---
 
@@ -386,3 +386,23 @@ spec:
       targetPort: 80
       nodePort: 30200
 ```
+
+## Desplegar PG-Admin al cluster
+
+Para añadir el nuevo servicio al cluster, debemos ejecutar los siguientes comandos:
+
+```txt
+$: kubectl apply -f pg-admin-secrets.yaml
+
+$: kubectl apply -f pg-admin.yaml
+```
+
+Cuando tenemos un cambio dentro del archivo, debemos volver a aplicar los cambios mediante el comando `kubectl apply -f <file>`.
+
+Si tratamos de ingresar a `localhost:30200`, no se podrá conectar a nada de lo esperado de PGAdmin, pero no es motivo de preocupación, puesto que, debemos exponer el servicio al entorno de nuestro equipo, y en esta ocasión lo hacemos con fines educativos:
+
+```txt
+$: minikube service pg-admin-service
+```
+
+Ahora si podemos acceder y trabajar con PGAdmin a `localhost:80` puesto que se ha aplicado un acceso por túnel, pero recordando que al no tener volúmenes, no podremos persistir la data del contenedor.
