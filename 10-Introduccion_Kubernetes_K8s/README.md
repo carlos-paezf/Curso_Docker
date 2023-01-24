@@ -119,3 +119,63 @@ También podemos usar la consola para convertir un string normal a un Base64:
 $: echo -n postgres | base64
 cG9zdGdyZXM=
 ```
+
+## Pods, Services y Deployments
+
+Vamos a crear un archivo llamado `postgres.yaml`, dentro del cual haremos el blueprint para el deployment:
+
+```yaml
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+    name: postgres-deployment
+
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: postgres
+    template:
+        metadata:
+            labels:
+                app: postgres
+        spec:
+            containers:
+            - name: postgres
+              image: postgres:15.1
+              resources:
+                limits:
+                    memory: "128Mi"
+                    cpu: "500m"
+              ports:
+              - containerPort: 5432
+              env:
+              - name: POSTGRESS_PASSWORD
+                valueFrom:
+                    secretKeyRef:
+                        name: postgres-secrets
+                        key: DB_PASSWORD
+```
+
+Ahora, para crear el servicio, el cual tendremos en el mismo archivo, haremos la siguiente configuración:
+
+```yaml
+apiVersion: v1
+
+kind: Service
+
+metadata:
+    name: postgres-service
+
+spec:
+    selector:
+        app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+```
+
+El nombre del servicio en la metadata es igual al que establecimos como host dentro del ConfigMap.
