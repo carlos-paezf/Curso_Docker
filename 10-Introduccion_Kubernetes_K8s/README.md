@@ -84,3 +84,38 @@ data:
     DB_HOST: postgres-service
     DB_PORT: "5432"
 ```
+
+## Secrets
+
+Hay elementos para la base de datos que necesitamos que sean secretos, para este caso vamos a crear un archivo llamado `postgres-secrets.yaml` (el nombre del archivo solo se usa como indicador para el programador, el verdadero nombre que importa es el que se define en `metadata`).
+
+```yaml
+apiVersion: v1
+
+kind: Secret
+
+metadata:
+    name: postgres-secrets
+
+type: Opaque
+
+data:
+    DB_USER: postgres
+    DB_PASSWORD: <Password>
+```
+
+Es importante tener en cuenta que para los secretos necesitamos tener una encriptacion tipo Base64, en este caso vamos a usar [Code Beautify](https://codebeautify.org/base64-encode) para codificar nuestros secretos en Base64. Una vez encriptados los datos, los asignados a los secretos del archivo:
+
+```yaml
+...
+data:
+    DB_USER: cG9zdGdyZXM=
+    DB_PASSWORD: PFBhc3N3b3JkPg==
+```
+
+También podemos usar la consola para convertir un string normal a un Base64:
+
+```txt
+$: echo -n postgres | base64
+cG9zdGdyZXM=
+```
