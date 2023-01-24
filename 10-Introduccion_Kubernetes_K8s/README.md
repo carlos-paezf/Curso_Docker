@@ -40,3 +40,29 @@ Kubernetes tiene 8 componentes principales:
 8. ***StatefulSet***, es el plano similar a los deployments, pero para bases de datos principalmente, no podemos replicar las bases de datos.
 
 Los ***Clusters*** son un grupo de nodos que corren aplicaciones en contenedores de una forma eficiente, automatizada, distribuida y escalable.
+
+## Instalación y configuración de MiniKube
+
+Vamos a usar [Minikube](https://minikube.sigs.k8s.io/docs/start/), es cual puede ser configurado rápidamente desde Docker Desktop al momento de activar Kubernetes. Para instalarlo de manera manual requerimos tener manejadores de contenedores y/o maquinas virtuales, lo cual ya tenemos con Docker. Para la descarga, podemos seleccionar el OS, arquitectura, release type y tipo de instalador deseado. En mi caso usare Windows x86-64, release Stable, y Windows Package Manager por lo que hago uso del siguiente comando:
+
+```txt
+$: winget install minikube
+```
+
+Para comprobar la instalación, usamos el siguiente comando (en ocasiones toca reiniciar el equipo para que reconozca la instalación):
+
+```txt
+$: minikube version
+```
+
+Para empezar el cluster en minikube usamos el comando:
+
+```txt
+$: minikube start
+```
+
+Una vez terminada la ejecución del comando, observaremos que tenemos un contenedor con varios puertos expuestos. Si queremos eliminar todo, entonces usamos el siguiente comando:
+
+```txt
+$: minikube delete --all
+```
