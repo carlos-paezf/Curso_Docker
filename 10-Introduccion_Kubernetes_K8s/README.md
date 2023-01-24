@@ -306,3 +306,83 @@ Events:
 ```
 
 Para conocer los logs del elemento cambiamos `describe` por `logs`
+
+## Agregar PG-Admin al cluster
+
+Vamos a instalar el servicio de PG-Admin, para lo cual primero vamos a configurar primero los secretos en nuevo archivo llamado `pg-admin-secrets.yaml`:
+
+```yaml
+apiVersion: v1
+
+kind: Secret
+
+metadata:
+    name: pg-admin-secrets
+
+type: Opaque
+
+data:
+    # echo -n superman@mail.com | base64
+    PG_USER_EMAIL: c3VwZXJtYW5AbWFpbC5jb20=
+    # echo -n Password | base64
+    PG_PASSWORD: UGFzc3dvcmQ=
+```
+
+Luego creamos el archivo `pg-admin.yaml` y añadimos la siguiente configuración:
+
+```yaml
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+    name: pg-admin-deployment
+
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: pg-admin
+    template:
+        metadata:
+            labels:
+                app: pg-admin
+        spec:
+            containers:
+            - name: pg-admin
+              image: dpage/pgadmin4:6.17
+              ports:
+              - containerPort: 80
+              env:
+              - name: PGADMIN_DEFAULT_PASSWORD
+                valueFrom:
+                    secretKeyRef:
+                        name: pg-admin-secrets
+                        key: PG_PASSWORD
+              - name: PGADMIN_DEFAULT_EMAIL
+                valueFrom:
+                    secretKeyRef:
+                        name: pg-admin-secrets
+                        key: PG_USER_EMAIL
+              - name: PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION
+                value: "false"
+
+---
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+    name: pg-admin-service
+
+spec:
+    type: NodePort
+    selector:
+        app: pg-admin
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30200
+```
