@@ -30,3 +30,4 @@ Algunas de las instalaciones recomendadas para el curso son las siguientes: [(Do
 - [Sección 07: Deployments y Registros](07-Deployments-Registros/README.md)
 - [Sección 08: Construcciones automáticas - Github Actions](08-Construcciones_automaticas_Github_Actions/README.md)
 - [Sección 09: NGINX](09-NGINX/README.md)
+- [Sección 10: Introducción a Kubernetes - K8s](10-Introduccion_Kubernetes_K8s/README.md)
