@@ -66,3 +66,21 @@ Una vez terminada la ejecución del comando, observaremos que tenemos un contene
 ```txt
 $: minikube delete --all
 ```
+
+## ConfigMap
+
+Vamos a crear un nuevo directorio llamado `k8s-teslo`, y tendremos en cuenta la documentación de [Kubernetes](https://kubernetes.io/es/docs/concepts/). Vamos a iniciar con la base de datos, normalmente lo aprovisionaríamos desde algún servicio mediante una cadena de conexión, pero en esta ocasión vamos a hacerlo desde un configMap llamado `postgres-config.yaml`, dentro del cual tendremos un pares de llave-valor con los datos que no requiero ofuscar:
+
+```yaml
+apiVersion: v1
+
+kind: ConfigMap
+
+metadata:
+    name: postgres-config
+
+data:
+    DB_NAME: postgres
+    DB_HOST: postgres-service
+    DB_PORT: "5432"
+```
