@@ -180,3 +180,17 @@ CMD [ "nginx", "-g", "daemon off;" ]
 ```
 
 Cuando levantamos la nueva imagen, y creamos un contenedor con la misma, podremos observar que las rutas ya no generan problema, y sin importar en donde estemos o que parámetros usemos, si recargamos la página, todo se mantendrá estable. El único inconveniente es que seguimos sin ver las imágenes.
+
+## Copiar los recursos estáticos
+
+Físicamente las imágenes no existen en el servidor de NGINX, una manera sería que nos aseguráramos que las imágenes se encuentren dentro del directorio de `dist` de manera manual, pero lo que vamos a hacer, es la misma idea usando un comando en Dockerfile, en la etapa de `prod`
+
+```Dockerfile
+...
+FROM nginx:1.23.3 as prod
+...
+COPY assets/ /usr/share/nginx/html/assets
+...
+```
+
+Si creamos de nuevo la imagen y un contenedor que la use, podemos observar de que las imágenes ya se pueden ver.
