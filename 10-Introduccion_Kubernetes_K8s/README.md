@@ -179,3 +179,130 @@ spec:
 ```
 
 El nombre del servicio en la metadata es igual al que establecimos como host dentro del ConfigMap.
+
+## Desplegar la base de datos en el cluster
+
+Vamos a crear ina instancia de la terminal dentro del directorio `k8s-teslo`. Lo primero es asegurarnos que kubectl se encuentre instalado con el siguiente comando:
+
+```txt
+$: kubectl version --short
+```
+
+A continuación vamos a ejecutar todos los archivos que creamos dentro del directorio, mientras haya referencias, debemos ejecutar los yaml en orden con el fin de no romper las dependencias.
+
+Para conocer la información acerca de nuestro cluster usamos el siguiente comando:
+
+```txt
+$: kubectl get all
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   83m
+```
+
+Comenzamos la aplicación de los archivos:
+
+```txt
+$: kubectl apply -f postgres-config.yaml
+configmap/postgres-config created
+
+$: kubectl apply -f postgres-secrets.yaml
+secret/postgres-secrets created
+
+$: kubectl apply -f postgres.yaml
+deployment.apps/postgres-deployment created
+service/postgres-service created
+```
+
+Cuando usamos el comando `kubectl get all` para observar los componentes, obtenemos la siguiente salida:
+
+```txt
+$: kubectl get all
+NAME                                      READY   STATUS              RESTARTS   AGE
+pod/postgres-deployment-678b4c7dd-95cf9   0/1     ContainerCreating   0          54s
+
+NAME                       TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+service/kubernetes         ClusterIP   10.96.0.1     <none>        443/TCP    85m
+service/postgres-service   ClusterIP   10.105.41.2   <none>        5432/TCP   55s
+
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/postgres-deployment   0/1     1            0           55s
+
+NAME                                            DESIRED   CURRENT   READY   AGE
+replicaset.apps/postgres-deployment-678b4c7dd   1         1         0       55s
+```
+
+Cuando hay un elemento que tenga el valor de `0/1` o un patron similar en la columna de `READY`, significa que aún no están listos todos los procesos, y mediante el valor de la columna `STATUS` sabremos en que etapa se encuentra el elemento. Si en un tiempo prudente ejecutamos de nuevo el mismo comando de arriba, debemos obtener el `1/1`, o de lo contrario nos debe indicar el `STATUS` que ha ocurrido un error.
+
+Para verificar si algo ha salido mal, o saber el estado de un elemento, usamos el siguiente comando:
+
+```txt
+$: kubectl describe <nombre del elemento>
+```
+
+Por ejemplo para el elemento `pod/postgres-deployment-678b4c7dd-95cf9` de la lista impresa:
+
+```txt
+$: kubectl describe pod/postgres-deployment-678b4c7dd-95cf9
+Name:             postgres-deployment-678b4c7dd-95cf9
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/<IP>
+Start Time:       Tue, 24 Jan 2023 15:45:31 -0500
+Labels:           app=postgres
+                  pod-template-hash=678b4c7dd
+Annotations:      <none>
+Status:           Pending
+IP:               <IP>
+IPs:
+  IP:           <IP>
+Controlled By:  ReplicaSet/postgres-deployment-678b4c7dd
+Containers:
+  postgres:
+    Container ID:
+    Image:          postgres:15.1
+    Image ID:
+    Port:           5432/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       ImagePullBackOff
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     500m
+      memory:  128Mi
+    Requests:
+      cpu:     500m
+      memory:  128Mi
+    Environment:
+      POSTGRESS_PASSWORD:  <set to the key 'DB_PASSWORD' in secret 'postgres-secrets'>  Optional: false
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-69xtn (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  kube-api-access-69xtn:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Guaranteed
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  8m37s                 default-scheduler  Successfully assigned default/postgres-deployment-678b4c7dd-95cf9 to minikube
+  Warning  Failed     2m1s (x3 over 6m37s)  kubelet            Failed to pull image "postgres:15.1": rpc error: code = Unknown desc = context deadline exceeded
+  Warning  Failed     2m1s (x3 over 6m37s)  kubelet            Error: ErrImagePull
+  Normal   BackOff    94s (x4 over 6m36s)   kubelet            Back-off pulling image "postgres:15.1"
+  Warning  Failed     94s (x4 over 6m36s)   kubelet            Error: ImagePullBackOff
+  Normal   Pulling    79s (x4 over 8m36s)   kubelet            Pulling image "postgres:15.1"
+```
+
+Para conocer los logs del elemento cambiamos `describe` por `logs`
