@@ -500,3 +500,19 @@ spec:
       targetPort: 3000
       nodePort: 30300
 ```
+
+## Desplegar Backend al cluster
+
+Vamos a desplegar los secrets y el deployment de la nueva imagen:
+
+```txt
+$: kubectl apply -f backend-secrets.yaml
+
+$: kubectl apply -f backend.yaml
+```
+
+Con la aplicación podemos hacer el `describe` para saber lo que contiene el pod, y observar los `logs` con los outputs del mismo. Si queremos aplicar un cambio en cualquiera de los archivos, debemos realizar el `apply` de los nuevos cambios, pero para relanzar el servidor backend con los nuevos cambios debemos usar el comando:
+
+```txt
+$: kubectl rollout deployment <nombre del deployment>
+```
