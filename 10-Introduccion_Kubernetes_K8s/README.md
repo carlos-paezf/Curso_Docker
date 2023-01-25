@@ -516,3 +516,25 @@ Con la aplicación podemos hacer el `describe` para saber lo que contiene el pod
 ```txt
 $: kubectl rollout deployment <nombre del deployment>
 ```
+
+## Probar backend y limpieza
+
+Vamos a exponer el servicio del backend con el comando:
+
+```txt
+$: minikube service backend-service
+```
+
+Lo anterior nos abre de manera inmediata una pestaña en el navegador, en la cual podemos navegar a la documentación que se encuentra en `localhost:<port>/api` y ejecutar la sentencia de seed.
+
+Nosotros le cambiamos el nombre al archivo de `pg-admin-secrets.yaml` a `backend-secrets.yaml`, e igualmente al deployment, pero nunca lo eliminamos del cluster, por lo tanto tenemos acceso aún a ese servicio y por lo tanto lo podemos exponer:
+
+```txt
+$: minikube service pg-admin-service
+```
+
+Para aplicar la limpieza del cluster usamos el siguiente comando:
+
+```txt
+$: minikube delete --all
+```
