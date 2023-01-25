@@ -406,3 +406,97 @@ $: minikube service pg-admin-service
 ```
 
 Ahora si podemos acceder y trabajar con PGAdmin a `localhost:80` puesto que se ha aplicado un acceso por túnel, pero recordando que al no tener volúmenes, no podremos persistir la data del contenedor.
+
+## Agregar el BackendApp al Cluster
+
+Vamos a usar la imagen [klerith/k8s-teslo-backend](https://hub.docker.com/r/klerith/k8s-teslo-backend) en la version 1.1.0, y renombramos el archivo `pg-admin-secrets.yaml` por `backend-secrets.yaml` y lo más importante, cambiar el nombre dentro de la sección de metadata:
+
+```yaml
+...
+metadata:
+    name: backend-secrets
+...
+```
+
+Otra nueva configuración, es añadir la clave secreta para JWT. Aplicamos también el cambio de nombre para el archivo donde tenemos el deploy y el service, pasamos de `pg-admin.yaml` a `backend.yaml`. Reemplazamos la imagen de dpage/pgadmin por klerith/k8s-teslo-backend, el puerto del contenedor, y las variables de entorno:
+
+```yaml
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+    name: backend-deployment
+
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app: backend
+    template:
+        metadata:
+            labels:
+                app: backend
+        spec:
+            containers:
+            - name: backend
+              image: klerith/k8s-teslo-backend:1.1.0
+              ports:
+              - containerPort: 3000
+              env:
+              - name: APP_VERSION
+                value: "1.1.0"
+              - name: PORT
+                value: "3000"
+              - name: STAGE
+                value: "prod"
+              - name: DB_NAME
+                valueFrom:
+                    configMapKeyRef:
+                        name: postgres-config
+                        key: DB_NAME
+              - name: DB_HOST
+                valueFrom:
+                    configMapKeyRef:
+                        name: postgres-config
+                        key: DB_HOST
+              - name: DB_PORT
+                valueFrom:
+                    configMapKeyRef:
+                        name: postgres-config
+                        key: DB_PORT
+              - name: DB_USERNAME
+                valueFrom:
+                    secretKeyRef:
+                        name: postgres-secrets
+                        key: DB_USERNAME
+              - name: DB_PASSWORD
+                valueFrom:
+                    secretKeyRef:
+                        name: postgres-secrets
+                        key: DB_PASSWORD
+              - name: JWT_SECRET
+                valueFrom:
+                    secretKeyRef:
+                        name: backend-secrets
+                        key: JWT_SECRET
+
+---
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+    name: backend-service
+
+spec:
+    type: NodePort
+    selector:
+        app: backend
+    ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30300
+```
