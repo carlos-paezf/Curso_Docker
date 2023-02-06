@@ -15,7 +15,7 @@ Algunas de las instalaciones recomendadas para el curso son las siguientes: [(Do
 - Git
 - Docker Desktop
 - Table Plus
-- [Guías de atajos Docker](01-Introduccion/docker-cheat-sheet.pdf)
+- [Guías de atajos Docker](docker-cheat-sheet.pdf)
 - NGINX Configuration (Extensión de VSCode)
 - Json Viewer Awesome (Extensión de Chrome)
 
